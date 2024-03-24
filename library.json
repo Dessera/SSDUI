@@ -1,0 +1,13 @@
+{
+  "name": "SSDUI",
+  "keywords": "oled",
+  "description": "A generic UI framework for embedded device, highly depends on C++20 & standard library",
+  "version": "0.0.0",
+  "authors": {
+    "name": "Dessera",
+    "url": "https://deslab.top"
+  },
+  "export": {
+    "include": ["src", "LICENSE.txt"]
+  }
+}
