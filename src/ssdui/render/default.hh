@@ -29,8 +29,8 @@ class DefaultRenderer {
 
   ~DefaultRenderer() { m_wire->end(); }
 
-  std::size_t command(const std::vector<uint8_t>& data);
-  std::size_t data(const std::vector<uint8_t>& data);
+  std::size_t command(common::Span<uint8_t> command);
+  std::size_t data(common::Span<uint8_t> data);
 };
 
 }  // namespace ssdui::render

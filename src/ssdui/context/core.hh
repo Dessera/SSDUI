@@ -5,6 +5,7 @@
 #include <memory>
 #include <thread>
 
+#include "ssdui/common/geometry.hh"
 #include "ssdui/context/buffer.hh"
 #include "ssdui/context/config.hh"
 #include "ssdui/render/concept.hh"
@@ -25,8 +26,8 @@ namespace _helper {
  * @brief Copy of IsComponent concept, to avoid circular dependency
  */
 template <typename Cmp, typename Rnd>
-concept IsComponent = requires(Cmp comp) {
-  { comp(std::declval<context::Context<Rnd> *>()) };
+concept IsComponent = requires(Cmp comp, context::Context<Rnd> *ctx) {
+  { comp(ctx) };
 };
 
 /**
@@ -35,7 +36,7 @@ concept IsComponent = requires(Cmp comp) {
 template <typename Rnd>
   requires render::IsRenderer<Rnd>
 class BaseComponent {
-public:
+ public:
   virtual void operator()(context::Context<Rnd> *ctx) = 0;
 };
 
@@ -45,16 +46,16 @@ public:
 template <typename Cmp, typename Rnd>
   requires render::IsRenderer<Rnd> && IsComponent<Cmp, Rnd>
 class RootComponent : public BaseComponent<Rnd> {
-private:
+ private:
   Cmp m_cmp;
 
-public:
+ public:
   explicit RootComponent(Cmp &&cmp) : m_cmp(std::move(cmp)) {}
 
   void operator()(context::Context<Rnd> *ctx) override { m_cmp(ctx); }
 };
 
-} // namespace _helper
+}  // namespace _helper
 
 /**
  * @brief Context UI object
@@ -66,25 +67,26 @@ template <typename Rnd>
 class Context {
   friend class ContextBuilder<Rnd>;
 
-public:
+ public:
   using Self = Context;
 
-private:
+ private:
   Config m_config;
   std::unique_ptr<Rnd> m_renderer;
   std::unique_ptr<_helper::BaseComponent<Rnd>> m_root{nullptr};
   CachedBuffer m_buffer;
 
-public:
+ public:
   // // private constructor
   explicit Context(const Config &config, std::unique_ptr<Rnd> &&renderer)
-      : m_config(config), m_renderer(std::move(renderer)),
+      : m_config(config),
+        m_renderer(std::move(renderer)),
         m_buffer(config.width, config.page) {}
   // Getters
   [[nodiscard]] const Config &config() const { return m_config; }
   [[nodiscard]] Rnd *renderer() const { return m_renderer.get(); }
   [[nodiscard]] CachedBuffer &buffer() { return m_buffer; }
-  [[nodiscard]] _helper::BaseComponent<Rnd>*root() const {
+  [[nodiscard]] _helper::BaseComponent<Rnd> *root() const {
     return m_root.get();
   }
 
@@ -104,6 +106,7 @@ public:
     return *this;
   }
 };
+}  // namespace ssdui::context
 
 /**
  * @brief Builder for Context
@@ -141,19 +144,3 @@ public:
 //                                           std::move(m_renderer));
 //   }
 // };
-
-template<typename Rnd>
-class GlobalContextManager {
- private:
-  std::unique_ptr<Context<Rnd>> m_ctx;
-  std::thread m_update_handler;
-
-  explicit GlobalContextManager(std::unique_ptr<Rnd>&& ctx): m_ctx(std::move(ctx)) {
-    m_update_handler = std::thread([this]() {
-
-    });
-  }
-  ~GlobalContextManager() { m_update_handler.join(); }
-};
-
-} // namespace ssdui::context

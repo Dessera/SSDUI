@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cstdint>
-#include <memory>
 
 #include "ssdui/context/config.hh"
 #include "ssdui/context/core.hh"

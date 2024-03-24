@@ -2,16 +2,13 @@
 
 #include <cstdint>
 
-#include "HardwareSerial.h"
-
 #ifdef ARDUINO
 
 #include <cstddef>
-#include <numeric>
 
 namespace ssdui::render {
 
-std::size_t DefaultRenderer::command(const std::vector<uint8_t>& data) {
+std::size_t DefaultRenderer::command(common::Span<uint8_t> data) {
   std::lock_guard<std::mutex> lock(m_mtx);
 
   std::size_t bytes_sent = 0;
@@ -32,7 +29,7 @@ std::size_t DefaultRenderer::command(const std::vector<uint8_t>& data) {
   return bytes_sent;
 }
 
-std::size_t DefaultRenderer::data(const std::vector<uint8_t>& data) {
+std::size_t DefaultRenderer::data(common::Span<uint8_t> data) {
   std::lock_guard<std::mutex> lock(m_mtx);
 
   std::size_t bytes_sent = 0;

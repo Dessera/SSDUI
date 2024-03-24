@@ -9,8 +9,8 @@
 namespace ssdui::component {
 
 template <typename Cmp, typename Rnd>
-concept IsComponent = requires(Cmp comp) {
-  { comp(std::declval<context::Context<Rnd>*>()) };
+concept IsComponent = requires(Cmp comp, context::Context<Rnd> *ctx) {
+  { comp(ctx) };
 };
 
 // maybe another wat to impl
