@@ -20,8 +20,8 @@ class CachedBuffer {
   CachedBuffer(uint8_t width, uint8_t page)
       : m_width(width),
         m_page(page),
-        m_current(width * page, 0),
-        m_previous(width * page, 0) {}
+        m_current(width * page, 0xFF),
+        m_previous(width * page, 0x00) {}
 
   uint8_t& operator()(uint8_t x, uint8_t y) {
     return m_current[x + y * m_width];

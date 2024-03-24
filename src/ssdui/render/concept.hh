@@ -9,8 +9,7 @@
 namespace ssdui::render {
 
 /**
- * @brief Renderer concept
- * @tparam T A type to be checked
+ * @brief 渲染器接口定义
  */
 template <typename T>
 concept IsRenderer = requires(T rend, common::Span<uint8_t> data) {

@@ -1,6 +1,8 @@
 #pragma once
 
+#include "esp32-hal.h"
 #include "ssdui/component/address.hh"
+#include "ssdui/context/core.hh"
 
 namespace ssdui::context {
 
@@ -44,12 +46,14 @@ class GlobalContextManager {
       // sleep for the rest of the frame (30fps)
       auto duration =
           std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-      std::this_thread::sleep_for(std::chrono::milliseconds(33) - duration);
+      if (duration < std::chrono::milliseconds(33)) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(33) - duration);
+      }
     }
   }
 
  public:
-  explicit GlobalContextManager(std::unique_ptr<Rnd> &&ctx)
+  explicit GlobalContextManager(std::unique_ptr<Context<Rnd>> &&ctx)
       : m_ctx(std::move(ctx)) {
     m_update_handler =
         std::thread([this]() { this->_update_thread_handler(); });

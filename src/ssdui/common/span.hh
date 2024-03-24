@@ -22,7 +22,7 @@ class Span {
 
   // initializer list
   Span(std::initializer_list<T> list)
-      : m_data(list.begin()), m_size(list.size()) {}
+      : m_data(const_cast<T *>(list.begin())), m_size(list.size()) {}
 
   ~Span() = default;
 

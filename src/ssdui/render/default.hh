@@ -11,6 +11,9 @@
 
 namespace ssdui::render {
 
+/**
+ * @brief 测试用的默认渲染器，需要在Arduino + ESP32环境下使用
+ */
 class DefaultRenderer {
  public:
   inline static constexpr uint8_t COMMAND_PREFIX = 0x00;

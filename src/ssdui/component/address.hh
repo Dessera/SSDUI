@@ -123,7 +123,7 @@ class SetColumnAddress {
 
     if (config.addressing_mode == context::AddressMode::PAGE) {
       // downcast to SetStartColumn
-      ctx->run(SetStartColumn<Rnd>(m_start_column));
+      SetStartColumn<Rnd>(m_start_column).operator()(ctx);
     }
 
     if (m_start_column >= config.width || m_end_column >= config.width) {
@@ -159,7 +159,7 @@ class SetPageAddress {
 
     if (config.addressing_mode == context::AddressMode::PAGE) {
       // downcast to SetStartPage
-      ctx->run(SetStartPage<Rnd>(m_start_page));
+      SetStartPage<Rnd>(m_start_page).operator()(ctx);
     }
 
     if (m_start_page >= config.page || m_end_page >= config.page) {

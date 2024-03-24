@@ -16,14 +16,10 @@ template <typename Rnd>
   requires render::IsRenderer<Rnd>
 class Context;
 
-template <typename Rnd>
-  requires render::IsRenderer<Rnd>
-class ContextBuilder;
-
 namespace _helper {
 
 /**
- * @brief Copy of IsComponent concept, to avoid circular dependency
+ * @brief 组件类型的静态接口，由组件头文件拷贝（为了避免循环依赖）
  */
 template <typename Cmp, typename Rnd>
 concept IsComponent = requires(Cmp comp, context::Context<Rnd> *ctx) {
@@ -31,7 +27,7 @@ concept IsComponent = requires(Cmp comp, context::Context<Rnd> *ctx) {
 };
 
 /**
- * @brief A dynamic interface for Component type
+ * @brief 组件类型的动态接口
  */
 template <typename Rnd>
   requires render::IsRenderer<Rnd>
@@ -41,7 +37,7 @@ class BaseComponent {
 };
 
 /**
- * @brief An explicit root component to avoid massive context template params
+ * @brief 显示的根组件，仅做转发，为了缩减模板参数
  */
 template <typename Cmp, typename Rnd>
   requires render::IsRenderer<Rnd> && IsComponent<Cmp, Rnd>
@@ -58,15 +54,11 @@ class RootComponent : public BaseComponent<Rnd> {
 }  // namespace _helper
 
 /**
- * @brief Context UI object
- *
- * @tparam Rnd Renderer type
+ * @brief 显示上下文对象，用于管理显示的所有API
  */
 template <typename Rnd>
   requires render::IsRenderer<Rnd>
 class Context {
-  friend class ContextBuilder<Rnd>;
-
  public:
   using Self = Context;
 
@@ -90,57 +82,17 @@ class Context {
     return m_root.get();
   }
 
-  template <typename Cmp>
-    requires _helper::IsComponent<Cmp, Rnd>
-  Self &run(const Cmp &comp) {
-    comp(this);
-    return *this;
-  }
+  // template <typename Cmp>
+  //   requires _helper::IsComponent<Cmp, Rnd>
+  // Self &run(const Cmp &comp) {
+  //   comp(this);
+  // }
 
   template <typename Cmp>
     requires _helper::IsComponent<Cmp, Rnd>
-  Self &mount(std::unique_ptr<Cmp> &&comp) {
-    m_root = std::move(comp);
-    // directly call run() will cause error
-    m_root->operator()(this);
-    return *this;
+  void mount(Cmp &&comp) {
+    m_root =
+        std::make_unique<_helper::RootComponent<Cmp, Rnd>>(std::move(comp));
   }
 };
 }  // namespace ssdui::context
-
-/**
- * @brief Builder for Context
- *
- * @tparam Rnd Renderer type
- */
-// template <typename Rnd>
-//   requires render::IsRenderer<Rnd>
-// class ContextBuilder {
-//  public:
-//   using Self = ContextBuilder;
-
-//  private:
-//   std::optional<Config> m_config{std::nullopt};
-//   std::shared_ptr<Rnd> m_renderer{nullptr};
-
-//  public:
-//   // Setters
-//   Self& config(const Config& cfg) {
-//     m_config = cfg;
-//     return *this;
-//   }
-
-//   Self& renderer(std::unique_ptr<Rnd>&& renderer) {
-//     m_renderer = std::move(renderer);
-//     return *this;
-//   }
-
-//   // Build
-//   std::unique_ptr<Context<Rnd>> build() {
-//     if (!m_config.has_value() || m_renderer == nullptr) {
-//       throw std::runtime_error("ContextBuilder: missing config or renderer");
-//     }
-//     return std::make_unique<Context<Rnd>>(m_config.value(),
-//                                           std::move(m_renderer));
-//   }
-// };

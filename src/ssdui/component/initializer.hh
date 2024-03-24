@@ -41,25 +41,25 @@ class DefaultInitializer {
 
     delay(INIT_DELAY);
 
-    ctx->run(fundamental::SetDisplay<Rnd>(false))
-        .run(hardware::SetClockRatioAndFrequency<Rnd>(cfg.clock_ratio,
-                                                      cfg.clock_frequency))
-        .run(hardware::SetMultiplexRatio<Rnd>(cfg.multiplex_ratio))
-        .run(hardware::SetDisplayOffset<Rnd>(cfg.display_offset))
-        .run(address::SetAddressingMode<Rnd>(cfg.addressing_mode))
-        .run(hardware::SetDisplayStartLine<Rnd>(cfg.start_line))
-        .run(hardware::SetSegmentRemap<Rnd>(cfg.horizontal_flip))
-        .run(hardware::SetComOutputScanDirection<Rnd>(cfg.vertical_flip))
-        .run(hardware::SetComPinsHardwareConfiguration<Rnd>(cfg.com_pins))
-        .run(hardware::SetPrechargePeriod<Rnd>(cfg.precharge_phase1,
-                                               cfg.precharge_phase2))
-        .run(hardware::SetVCOMH<Rnd>(cfg.vcomh_level))
-        .run(fundamental::SetEntireDisplay<Rnd>(cfg.entire_display_on))
-        .run(fundamental::SetInvert<Rnd>(cfg.inverse_display))
-        .run(hardware::SetChargePump<Rnd>(cfg.charge_pump_enable))
-        .run(address::SetPageAddress<Rnd>(cfg.page_start, cfg.page_end))
-        .run(address::SetColumnAddress<Rnd>(cfg.column_start, cfg.column_end))
-        .run(fundamental::SetDisplay<Rnd>(cfg.display_on));
+    fundamental::SetDisplay<Rnd>(false)(ctx);
+    hardware::SetClockRatioAndFrequency<Rnd>(cfg.clock_ratio,
+                                             cfg.clock_frequency)(ctx);
+    hardware::SetMultiplexRatio<Rnd>(cfg.multiplex_ratio)(ctx);
+    hardware::SetDisplayOffset<Rnd>(cfg.display_offset)(ctx);
+    address::SetAddressingMode<Rnd>(cfg.addressing_mode)(ctx);
+    hardware::SetDisplayStartLine<Rnd>(cfg.start_line)(ctx);
+    hardware::SetSegmentRemap<Rnd>(cfg.horizontal_flip)(ctx);
+    hardware::SetComOutputScanDirection<Rnd>(cfg.vertical_flip)(ctx);
+    hardware::SetComPinsHardwareConfiguration<Rnd>(cfg.com_pins)(ctx);
+    hardware::SetPrechargePeriod<Rnd>(cfg.precharge_phase1,
+                                      cfg.precharge_phase2)(ctx);
+    hardware::SetVCOMH<Rnd>(cfg.vcomh_level)(ctx);
+    fundamental::SetEntireDisplay<Rnd>(cfg.entire_display_on)(ctx);
+    fundamental::SetInvert<Rnd>(cfg.inverse_display)(ctx);
+    hardware::SetChargePump<Rnd>(cfg.charge_pump_enable)(ctx);
+    address::SetPageAddress<Rnd>(cfg.page_start, cfg.page_end)(ctx);
+    address::SetColumnAddress<Rnd>(cfg.column_start, cfg.column_end)(ctx);
+    fundamental::SetDisplay<Rnd>(cfg.display_on)(ctx);
   }
 };
 
