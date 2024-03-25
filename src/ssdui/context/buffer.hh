@@ -10,8 +10,8 @@ namespace ssdui::context {
 
 class CachedBuffer {
  private:
-  std::vector<uint8_t> m_current;
-  std::vector<uint8_t> m_previous;
+  common::Span<uint8_t> m_current;
+  common::Span<uint8_t> m_previous;
 
   uint8_t m_width;
   uint8_t m_page;
@@ -20,8 +20,21 @@ class CachedBuffer {
   CachedBuffer(uint8_t width, uint8_t page)
       : m_width(width),
         m_page(page),
-        m_current(width * page, 0xFF),
-        m_previous(width * page, 0x00) {}
+        m_current(new uint8_t[width * page](), width * page),
+        m_previous(new uint8_t[width * page](), width * page) {
+    std::fill(m_current.begin(), m_current.end(), 0xFF);
+    std::fill(m_previous.begin(), m_previous.end(), 0x00);
+  }
+
+  ~CachedBuffer() {
+    delete[] m_current.data();
+    delete[] m_previous.data();
+  }
+
+  CachedBuffer(const CachedBuffer&) = delete;
+  CachedBuffer& operator=(const CachedBuffer&) = delete;
+  CachedBuffer(CachedBuffer&&) = delete;
+  CachedBuffer& operator=(CachedBuffer&&) = delete;
 
   uint8_t& operator()(uint8_t x, uint8_t y) {
     return m_current[x + y * m_width];

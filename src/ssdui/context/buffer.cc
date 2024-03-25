@@ -33,8 +33,7 @@ std::vector<geometry::Rect> CachedBuffer::get_dirty_regions() {
 
 common::Span<uint8_t> CachedBuffer::get_area(const geometry::Rect& rect) {
   auto [origin, width, height] = rect;
-  auto [x, y] = origin;
-  return {m_current.data() + x + y * m_width, width * height};
+  return {m_current.data() + origin.x + origin.y * m_width, width * height};
 }
 
 }  // namespace ssdui::context

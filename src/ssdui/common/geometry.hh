@@ -1,17 +1,17 @@
 #pragma once
 
-#include <cstddef>
+#include <cstdint>
 namespace ssdui::geometry {
 
 struct Point {
-  std::size_t x;
-  std::size_t y;
-} __attribute__((aligned(8)));
+  std::uint8_t x;
+  std::uint8_t y;
+} __attribute__((aligned(2)));
 
 struct Rect {
   Point origin;
-  std::size_t width;
-  std::size_t height;
-} __attribute__((aligned(16)));
+  std::uint8_t width;
+  std::uint8_t height;
+} __attribute__((aligned(4)));
 
 }  // namespace ssdui::geometry

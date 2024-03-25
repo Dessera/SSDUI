@@ -37,29 +37,29 @@ class DefaultInitializer {
   void operator()(context::Context<Rnd>* ctx) const {
     using namespace command;
 
-    const auto& cfg = ctx->config();
+    context::RuntimeConfig& cfg = ctx->config();
 
     delay(INIT_DELAY);
 
     fundamental::SetDisplay<Rnd>(false)(ctx);
-    hardware::SetClockRatioAndFrequency<Rnd>(cfg.clock_ratio,
-                                             cfg.clock_frequency)(ctx);
-    hardware::SetMultiplexRatio<Rnd>(cfg.multiplex_ratio)(ctx);
-    hardware::SetDisplayOffset<Rnd>(cfg.display_offset)(ctx);
-    address::SetAddressingMode<Rnd>(cfg.addressing_mode)(ctx);
-    hardware::SetDisplayStartLine<Rnd>(cfg.start_line)(ctx);
-    hardware::SetSegmentRemap<Rnd>(cfg.horizontal_flip)(ctx);
-    hardware::SetComOutputScanDirection<Rnd>(cfg.vertical_flip)(ctx);
-    hardware::SetComPinsHardwareConfiguration<Rnd>(cfg.com_pins)(ctx);
-    hardware::SetPrechargePeriod<Rnd>(cfg.precharge_phase1,
-                                      cfg.precharge_phase2)(ctx);
-    hardware::SetVCOMH<Rnd>(cfg.vcomh_level)(ctx);
-    fundamental::SetEntireDisplay<Rnd>(cfg.entire_display_on)(ctx);
-    fundamental::SetInvert<Rnd>(cfg.inverse_display)(ctx);
-    hardware::SetChargePump<Rnd>(cfg.charge_pump_enable)(ctx);
-    address::SetPageAddress<Rnd>(cfg.page_start, cfg.page_end)(ctx);
-    address::SetColumnAddress<Rnd>(cfg.column_start, cfg.column_end)(ctx);
-    fundamental::SetDisplay<Rnd>(cfg.display_on)(ctx);
+    hardware::SetClockRatioAndFrequency<Rnd>(cfg.clock_ratio(),
+                                             cfg.clock_frequency())(ctx);
+    hardware::SetMultiplexRatio<Rnd>(cfg.multiplex_ratio())(ctx);
+    hardware::SetDisplayOffset<Rnd>(cfg.display_offset())(ctx);
+    address::SetAddressingMode<Rnd>(cfg.addressing_mode())(ctx);
+    hardware::SetDisplayStartLine<Rnd>(cfg.start_line())(ctx);
+    hardware::SetSegmentRemap<Rnd>(cfg.horizontal_flip())(ctx);
+    hardware::SetComOutputScanDirection<Rnd>(cfg.vertical_flip())(ctx);
+    hardware::SetComPinsHardwareConfiguration<Rnd>(cfg.com_pins())(ctx);
+    hardware::SetPrechargePeriod<Rnd>(cfg.precharge_phase1(),
+                                      cfg.precharge_phase2())(ctx);
+    hardware::SetVCOMH<Rnd>(cfg.vcomh_level())(ctx);
+    fundamental::SetEntireDisplay<Rnd>(cfg.entire_display_on())(ctx);
+    fundamental::SetInvert<Rnd>(cfg.inverse_display())(ctx);
+    hardware::SetChargePump<Rnd>(cfg.charge_pump_enable())(ctx);
+    address::SetPageAddress<Rnd>(cfg.page_start(), cfg.page_end())(ctx);
+    address::SetColumnAddress<Rnd>(cfg.column_start(), cfg.column_end())(ctx);
+    fundamental::SetDisplay<Rnd>(cfg.display_on())(ctx);
   }
 };
 

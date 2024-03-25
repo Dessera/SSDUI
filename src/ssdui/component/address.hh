@@ -27,13 +27,13 @@ class SetStartColumn {
   explicit SetStartColumn(uint8_t column) : m_column(column) {}
 
   void operator()(context::Context<Rnd>* ctx) const {
-    const auto& config = ctx->config();
+    context::RuntimeConfig& config = ctx->config();
 
-    if (config.addressing_mode != context::AddressMode::PAGE) {
+    if (config.addressing_mode() != context::AddressMode::PAGE) {
       return;
     }
 
-    if (m_column >= config.width) {
+    if (m_column >= config.width()) {
       return;
     }
 
@@ -62,13 +62,13 @@ class SetStartPage {
   explicit SetStartPage(uint8_t page) : m_page(page) {}
 
   void operator()(context::Context<Rnd>* ctx) const {
-    const auto& config = ctx->config();
+    context::RuntimeConfig& config = ctx->config();
 
-    if (config.addressing_mode != context::AddressMode::PAGE) {
+    if (config.addressing_mode() != context::AddressMode::PAGE) {
       return;
     }
 
-    if (m_page >= config.page) {
+    if (m_page >= config.page()) {
       return;
     }
 
@@ -119,14 +119,14 @@ class SetColumnAddress {
       : m_start_column(start_column), m_end_column(end_column) {}
 
   void operator()(context::Context<Rnd>* ctx) const {
-    const auto& config = ctx->config();
+    context::RuntimeConfig& config = ctx->config();
 
-    if (config.addressing_mode == context::AddressMode::PAGE) {
+    if (config.addressing_mode() == context::AddressMode::PAGE) {
       // downcast to SetStartColumn
       SetStartColumn<Rnd>(m_start_column).operator()(ctx);
     }
 
-    if (m_start_column >= config.width || m_end_column >= config.width) {
+    if (m_start_column >= config.width() || m_end_column >= config.width()) {
       return;
     }
 
@@ -155,14 +155,14 @@ class SetPageAddress {
       : m_start_page(start_page), m_end_page(end_page) {}
 
   void operator()(context::Context<Rnd>* ctx) const {
-    const auto& config = ctx->config();
+    context::RuntimeConfig& config = ctx->config();
 
-    if (config.addressing_mode == context::AddressMode::PAGE) {
+    if (config.addressing_mode() == context::AddressMode::PAGE) {
       // downcast to SetStartPage
       SetStartPage<Rnd>(m_start_page).operator()(ctx);
     }
 
-    if (m_start_page >= config.page || m_end_page >= config.page) {
+    if (m_start_page >= config.page() || m_end_page >= config.page()) {
       return;
     }
 

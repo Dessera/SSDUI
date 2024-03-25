@@ -1,7 +1,6 @@
 #pragma once
 
 #include <memory>
-#include <tuple>
 #include <type_traits>
 
 #include "ssdui/context/core.hh"
