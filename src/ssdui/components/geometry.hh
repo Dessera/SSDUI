@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstddef>
+
 #include "ssdui/context/component.hh"
 #include "ssdui/geometry/line.hh"
 #include "ssdui/geometry/point.hh"
@@ -21,11 +23,11 @@ class Point : public SSDUI::Context::BaseComponent<Pl> {
   Point& operator=(Point&&) = delete;
 
   void operator()(SSDUI::Context::Context<Pl>* context) override {
-    if (point_.x < 0 || point_.x >= context->buffer().width() || point_.y < 0 ||
-        point_.y >= context->buffer().height()) {
+    if (point_.x < 0 || point_.x >= context->config().width || point_.y < 0 ||
+        point_.y >= context->config().height) {
       return;
     }
-    context->buffer().mixing(point_.x, point_.y / 8, 0x01 << (point_.y % 8));
+    context->buffer().mixin(point_.x, point_.y / 8, 0x01U << (point_.y % 8U));
   }
 };
 

@@ -1,12 +1,16 @@
 #pragma once
 
-#include "ssd1306_config.hh"
-#include "ssd1306_renderer.hh"
+#include <ssd1306_config.hh>
+#include <ssd1306_renderer.hh>
+
 enum class GlutEvent {
-  KEY_UP,
-  KEY_DOWN,
-  KEY_LEFT,
-  KEY_RIGHT,
+  KeyUp,
+  KeyDown,
+  KeyLeft,
+  KeyRight,
+  // KEY_DOWN,
+  // KEY_LEFT,
+  // KEY_RIGHT,
 };
 
 class GlutPlatform {

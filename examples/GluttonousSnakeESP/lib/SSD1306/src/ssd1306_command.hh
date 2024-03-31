@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <cstdint>
 
+#include "HardwareSerial.h"
 #include "esp32-hal.h"
 #include "ssd1306.hh"
 #include "ssdui/context/component.hh"
@@ -17,9 +18,9 @@ template <typename Pl>
   requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class SetStartColumn {
  public:
-  static inline constexpr std::byte COMMAND_SET_START_COLUMN_LOW{0x00};
-  static inline constexpr std::byte COMMAND_SET_START_COLUMN_HIGH{0x10};
-  static inline constexpr std::byte COLUMN_MASK{0x0F};
+  static inline constexpr uint8_t COMMAND_SET_START_COLUMN_LOW{0x00};
+  static inline constexpr uint8_t COMMAND_SET_START_COLUMN_HIGH{0x10};
+  static inline constexpr uint8_t COLUMN_MASK{0x0F};
 
  private:
   int16_t m_column;
@@ -39,10 +40,10 @@ class SetStartColumn {
       return;
     }
 
-    auto data = std::array<std::byte, 4>(
+    auto data = std::array<uint8_t, 4>(
         {COMMAND_SET_START_COLUMN_LOW,
-         static_cast<std::byte>(m_column) & COLUMN_MASK,
-         COMMAND_SET_START_COLUMN_HIGH, static_cast<std::byte>(m_column >> 4)});
+         static_cast<uint8_t>(m_column) & COLUMN_MASK,
+         COMMAND_SET_START_COLUMN_HIGH, static_cast<uint8_t>(m_column) >> 4});
     ctx->renderer()->command(data);
   }
 };
@@ -54,10 +55,10 @@ template <typename Pl>
   requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class SetStartPage {
  public:
-  static inline constexpr std::byte COMMAND_SET_START_PAGE{0xB0};
+  static inline constexpr uint8_t COMMAND_SET_START_PAGE{0xB0};
 
  private:
-  uint8_t m_page;
+  int16_t m_page;
 
  public:
   explicit SetStartPage(uint8_t page) : m_page(page) {}
@@ -74,8 +75,8 @@ class SetStartPage {
       return;
     }
 
-    auto data = std::array<std::byte, 2>(
-        {COMMAND_SET_START_PAGE, static_cast<std::byte>(m_page)});
+    auto data = std::array<uint8_t, 1>(
+        {COMMAND_SET_START_PAGE | static_cast<uint8_t>(m_page)});
     ctx->renderer()->command(data);
   }
 };
@@ -87,7 +88,7 @@ template <typename Pl>
   requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class SetAddressingMode {
  public:
-  static inline constexpr std::byte COMMAND_SET_ADDRESSING_MODE{0x20};
+  static inline constexpr uint8_t COMMAND_SET_ADDRESSING_MODE{0x20};
 
  private:
   AddressMode m_mode;
@@ -96,8 +97,8 @@ class SetAddressingMode {
   explicit SetAddressingMode(AddressMode mode) : m_mode(mode) {}
 
   void operator()(SSDUI::Context::Context<Pl>* ctx) const {
-    auto data = std::array<std::byte, 2>(
-        {COMMAND_SET_ADDRESSING_MODE, static_cast<std::byte>(m_mode)});
+    auto data = std::array<uint8_t, 2>(
+        {COMMAND_SET_ADDRESSING_MODE, static_cast<uint8_t>(m_mode)});
     ctx->renderer()->command(data);
   }
 };
@@ -109,7 +110,7 @@ template <typename Pl>
   requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class SetColumnAddress {
  public:
-  static inline constexpr std::byte COMMAND_SET_COLUMN_ADDRESS{0x21};
+  static inline constexpr uint8_t COMMAND_SET_COLUMN_ADDRESS{0x21};
 
  private:
   int16_t m_start_column;
@@ -133,9 +134,9 @@ class SetColumnAddress {
       return;
     }
 
-    auto data = std::array<std::byte, 3>(
-        {COMMAND_SET_COLUMN_ADDRESS, static_cast<std::byte>(m_start_column),
-         static_cast<std::byte>(m_end_column)});
+    auto data = std::array<uint8_t, 3>({COMMAND_SET_COLUMN_ADDRESS,
+                                        static_cast<uint8_t>(m_start_column),
+                                        static_cast<uint8_t>(m_end_column)});
     ctx->renderer()->command(data);
   }
 };
@@ -147,7 +148,7 @@ template <typename Pl>
   requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class SetPageAddress {
  public:
-  static inline constexpr std::byte COMMAND_SET_PAGE_ADDRESS{0x22};
+  static inline constexpr uint8_t COMMAND_SET_PAGE_ADDRESS{0x22};
 
  private:
   int16_t m_start_page;
@@ -171,9 +172,9 @@ class SetPageAddress {
       return;
     }
 
-    auto data = std::array<std::byte, 3>({COMMAND_SET_PAGE_ADDRESS,
-                                          static_cast<std::byte>(m_start_page),
-                                          static_cast<std::byte>(m_end_page)});
+    auto data = std::array<uint8_t, 3>({COMMAND_SET_PAGE_ADDRESS,
+                                        static_cast<uint8_t>(m_start_page),
+                                        static_cast<uint8_t>(m_end_page)});
     ctx->renderer()->command(data);
   }
 };
@@ -185,10 +186,10 @@ template <typename Pl>
   requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class Nop {
  public:
-  static inline constexpr std::byte COMMAND_CODE{0xE3};
+  static inline constexpr uint8_t COMMAND_CODE{0xE3};
 
   void operator()(SSDUI::Context::Context<Pl>* ctx) const {
-    auto data = std::array<std::byte, 1>({COMMAND_CODE});
+    auto data = std::array<uint8_t, 1>({COMMAND_CODE});
     ctx->renderer()->command(data);
   }
 };
@@ -200,8 +201,8 @@ template <typename Pl>
   requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class SetDisplay {
  public:
-  static inline constexpr std::byte COMMAND_DISPLAY_ON{0xAF};
-  static inline constexpr std::byte COMMAND_DISPLAY_OFF{0xAE};
+  static inline constexpr uint8_t COMMAND_DISPLAY_ON{0xAF};
+  static inline constexpr uint8_t COMMAND_DISPLAY_OFF{0xAE};
 
  private:
   bool m_state;
@@ -210,7 +211,7 @@ class SetDisplay {
   explicit SetDisplay(bool state) : m_state(state) {}
 
   void operator()(SSDUI::Context::Context<Pl>* ctx) const {
-    auto data = std::array<std::byte, 1>(
+    auto data = std::array<uint8_t, 1>(
         {m_state ? COMMAND_DISPLAY_ON : COMMAND_DISPLAY_OFF});
     ctx->renderer()->command(data);
   }
@@ -223,7 +224,7 @@ template <typename Pl>
   requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class SetContrast {
  public:
-  static inline constexpr std::byte COMMAND_SET_CONTRAST{0x81};
+  static inline constexpr uint8_t COMMAND_SET_CONTRAST{0x81};
 
  private:
   uint8_t m_contrast;
@@ -232,8 +233,8 @@ class SetContrast {
   explicit SetContrast(uint8_t contrast) : m_contrast(contrast) {}
 
   void operator()(SSDUI::Context::Context<Pl>* ctx) const {
-    auto data = std::array<std::byte, 2>(
-        {COMMAND_SET_CONTRAST, static_cast<std::byte>(m_contrast)});
+    auto data = std::array<uint8_t, 2>(
+        {COMMAND_SET_CONTRAST, static_cast<uint8_t>(m_contrast)});
     ctx->renderer()->command(data);
   }
 };
@@ -245,8 +246,8 @@ template <typename Pl>
   requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class SetInvert {
  public:
-  static inline constexpr std::byte COMMAND_INVERT_ON{0xA7};
-  static inline constexpr std::byte COMMAND_INVERT_OFF{0xA6};
+  static inline constexpr uint8_t COMMAND_INVERT_ON{0xA7};
+  static inline constexpr uint8_t COMMAND_INVERT_OFF{0xA6};
 
  private:
   bool m_state;
@@ -255,7 +256,7 @@ class SetInvert {
   explicit SetInvert(bool state) : m_state(state) {}
 
   void operator()(SSDUI::Context::Context<Pl>* ctx) const {
-    auto data = std::array<std::byte, 1>(
+    auto data = std::array<uint8_t, 1>(
         {m_state ? COMMAND_INVERT_ON : COMMAND_INVERT_OFF});
     ctx->renderer()->command(data);
   }
@@ -268,8 +269,8 @@ template <typename Pl>
   requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class SetEntireDisplay {
  public:
-  static inline constexpr std::byte COMMAND_ENTIRE_DISPLAY_ON{0xA5};
-  static inline constexpr std::byte COMMAND_ENTIRE_DISPLAY_OFF{0xA4};
+  static inline constexpr uint8_t COMMAND_ENTIRE_DISPLAY_ON{0xA5};
+  static inline constexpr uint8_t COMMAND_ENTIRE_DISPLAY_OFF{0xA4};
 
  private:
   bool m_state;
@@ -278,7 +279,7 @@ class SetEntireDisplay {
   explicit SetEntireDisplay(bool state) : m_state(state) {}
 
   void operator()(SSDUI::Context::Context<Pl>* ctx) const {
-    auto data = std::array<std::byte, 1>(
+    auto data = std::array<uint8_t, 1>(
         {m_state ? COMMAND_ENTIRE_DISPLAY_ON : COMMAND_ENTIRE_DISPLAY_OFF});
     ctx->renderer()->command(data);
   }
@@ -291,7 +292,7 @@ template <typename Pl>
   requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class SetPrechargePeriod {
  public:
-  static inline constexpr std::byte COMMAND_SET_PRECHARGE_PERIOD{0xD9};
+  static inline constexpr uint8_t COMMAND_SET_PRECHARGE_PERIOD{0xD9};
 
  private:
   uint8_t m_period_phase1;
@@ -302,9 +303,9 @@ class SetPrechargePeriod {
       : m_period_phase1(period_phase1), m_period_phase2(period_phase2) {}
 
   void operator()(SSDUI::Context::Context<Pl>* ctx) const {
-    auto data = std::array<std::byte, 2>(
+    auto data = std::array<uint8_t, 2>(
         {COMMAND_SET_PRECHARGE_PERIOD,
-         static_cast<std::byte>((m_period_phase2 << 4) | m_period_phase1)});
+         static_cast<uint8_t>((m_period_phase2 << 4) | m_period_phase1)});
     ctx->renderer()->command(data);
   }
 };
@@ -316,7 +317,7 @@ template <typename Pl>
   requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class SetVCOMH {
  public:
-  static inline constexpr std::byte COMMAND_SET_VCOMH{0xDB};
+  static inline constexpr uint8_t COMMAND_SET_VCOMH{0xDB};
 
  private:
   uint8_t m_vcomh_deselect_level;
@@ -326,8 +327,8 @@ class SetVCOMH {
       : m_vcomh_deselect_level(vcomh_deselect_level) {}
 
   void operator()(SSDUI::Context::Context<Pl>* ctx) const {
-    auto data = std::array<std::byte, 2>(
-        {COMMAND_SET_VCOMH, static_cast<std::byte>(m_vcomh_deselect_level)});
+    auto data = std::array<uint8_t, 2>(
+        {COMMAND_SET_VCOMH, static_cast<uint8_t>(m_vcomh_deselect_level)});
     ctx->renderer()->command(data);
   }
 };
@@ -339,7 +340,7 @@ template <typename Pl>
   requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class SetDisplayStartLine {
  public:
-  static inline constexpr std::byte COMMAND_SET_DISPLAY_START_LINE{0x40};
+  static inline constexpr uint8_t COMMAND_SET_DISPLAY_START_LINE{0x40};
 
  private:
   uint8_t m_start_line;
@@ -348,8 +349,8 @@ class SetDisplayStartLine {
   explicit SetDisplayStartLine(uint8_t start_line) : m_start_line(start_line) {}
 
   void operator()(SSDUI::Context::Context<Pl>* ctx) const {
-    auto data = std::array<std::byte, 1>(
-        {COMMAND_SET_DISPLAY_START_LINE | std::byte{m_start_line}});
+    auto data =
+        std::array<uint8_t, 1>({COMMAND_SET_DISPLAY_START_LINE | m_start_line});
     ctx->renderer()->command(data);
   }
 };
@@ -361,8 +362,8 @@ template <typename Pl>
   requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class SetSegmentRemap {
  public:
-  static inline constexpr std::byte COMMAND_SET_SEGMENT_NORMAL{0xA0};
-  static inline constexpr std::byte COMMAND_SET_SEGMENT_REMAP{0xA1};
+  static inline constexpr uint8_t COMMAND_SET_SEGMENT_NORMAL{0xA0};
+  static inline constexpr uint8_t COMMAND_SET_SEGMENT_REMAP{0xA1};
 
  private:
   bool m_remap;
@@ -371,7 +372,7 @@ class SetSegmentRemap {
   explicit SetSegmentRemap(bool remap) : m_remap(remap) {}
 
   void operator()(SSDUI::Context::Context<Pl>* ctx) const {
-    auto data = std::array<std::byte, 1>(
+    auto data = std::array<uint8_t, 1>(
         {m_remap ? COMMAND_SET_SEGMENT_REMAP : COMMAND_SET_SEGMENT_NORMAL});
     ctx->renderer()->command(data);
   }
@@ -389,7 +390,7 @@ template <typename Pl>
   requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class SetMultiplexRatio {
  public:
-  static inline constexpr std::byte COMMAND_SET_MULTIPLEX_RATIO{0xA8};
+  static inline constexpr uint8_t COMMAND_SET_MULTIPLEX_RATIO{0xA8};
 
  private:
   uint8_t m_ratio;
@@ -398,8 +399,7 @@ class SetMultiplexRatio {
   explicit SetMultiplexRatio(uint8_t ratio) : m_ratio(ratio) {}
 
   void operator()(SSDUI::Context::Context<Pl>* ctx) const {
-    auto data = std::array<std::byte, 2>(
-        {COMMAND_SET_MULTIPLEX_RATIO, static_cast<std::byte>(m_ratio)});
+    auto data = std::array<uint8_t, 2>({COMMAND_SET_MULTIPLEX_RATIO, m_ratio});
     ctx->renderer()->command(data);
   }
 };
@@ -411,8 +411,8 @@ template <typename Pl>
   requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class SetComOutputScanDirection {
  public:
-  static inline constexpr std::byte COMMAND_SET_COM_OUTPUT_SCAN_DIRECTION{0xC0};
-  static inline constexpr std::byte COMMAND_SET_COM_OUTPUT_SCAN_DIRECTION_REMAP{
+  static inline constexpr uint8_t COMMAND_SET_COM_OUTPUT_SCAN_DIRECTION{0xC0};
+  static inline constexpr uint8_t COMMAND_SET_COM_OUTPUT_SCAN_DIRECTION_REMAP{
       0xC8};
 
  private:
@@ -422,7 +422,7 @@ class SetComOutputScanDirection {
   explicit SetComOutputScanDirection(bool reverse) : m_reverse(reverse) {}
 
   void operator()(SSDUI::Context::Context<Pl>* ctx) const {
-    auto data = std::array<std::byte, 1>(
+    auto data = std::array<uint8_t, 1>(
         {m_reverse ? COMMAND_SET_COM_OUTPUT_SCAN_DIRECTION_REMAP
                    : COMMAND_SET_COM_OUTPUT_SCAN_DIRECTION});
     ctx->renderer()->command(data);
@@ -441,7 +441,7 @@ template <typename Pl>
   requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class SetDisplayOffset {
  public:
-  static inline constexpr std::byte COMMAND_SET_DISPLAY_OFFSET{0xD3};
+  static inline constexpr uint8_t COMMAND_SET_DISPLAY_OFFSET{0xD3};
 
  private:
   uint8_t m_offset;
@@ -450,8 +450,7 @@ class SetDisplayOffset {
   explicit SetDisplayOffset(uint8_t offset) : m_offset(offset) {}
 
   void operator()(SSDUI::Context::Context<Pl>* ctx) const {
-    auto data = std::array<std::byte, 2>(
-        {COMMAND_SET_DISPLAY_OFFSET, static_cast<std::byte>(m_offset)});
+    auto data = std::array<uint8_t, 2>({COMMAND_SET_DISPLAY_OFFSET, m_offset});
     ctx->renderer()->command(data);
   }
 };
@@ -463,7 +462,7 @@ template <typename Pl>
   requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class SetComPinsHardwareConfiguration {
  public:
-  static inline constexpr std::byte COMMAND_SET_COM_PINS_HARDWARE_CONFIGURATION{
+  static inline constexpr uint8_t COMMAND_SET_COM_PINS_HARDWARE_CONFIGURATION{
       0xDA};
 
  private:
@@ -475,8 +474,8 @@ class SetComPinsHardwareConfiguration {
 
   void operator()(SSDUI::Context::Context<Pl>* ctx) const {
     auto data =
-        std::array<std::byte, 2>({COMMAND_SET_COM_PINS_HARDWARE_CONFIGURATION,
-                                  static_cast<std::byte>(m_config)});
+        std::array<uint8_t, 2>({COMMAND_SET_COM_PINS_HARDWARE_CONFIGURATION,
+                                static_cast<uint8_t>(m_config)});
     ctx->renderer()->command(data);
   }
 };
@@ -488,7 +487,7 @@ template <typename Pl>
   requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class SetClockRatioAndFrequency {
  public:
-  static inline constexpr std::byte COMMAND_SET_CLOCK_RATIO_AND_FREQUENCY{0xD5};
+  static inline constexpr uint8_t COMMAND_SET_CLOCK_RATIO_AND_FREQUENCY{0xD5};
 
  private:
   uint8_t m_ratio;
@@ -499,9 +498,8 @@ class SetClockRatioAndFrequency {
       : m_ratio(ratio), m_frequency(frequency) {}
 
   void operator()(SSDUI::Context::Context<Pl>* ctx) const {
-    auto data = std::array<std::byte, 2>(
-        {COMMAND_SET_CLOCK_RATIO_AND_FREQUENCY,
-         static_cast<std::byte>((m_frequency << 4) | m_ratio)});
+    auto data = std::array<uint8_t, 2>(
+        {COMMAND_SET_CLOCK_RATIO_AND_FREQUENCY, (m_frequency << 4) | m_ratio});
     ctx->renderer()->command(data);
   }
 };
@@ -513,9 +511,9 @@ template <typename Pl>
   requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class SetChargePump {
  public:
-  static inline constexpr std::byte COMMAND_SET_CHARGE_PUMP{0x8D};
-  static inline constexpr std::byte COMMAND_SET_CHARGE_PUMP_ENABLE{0x14};
-  static inline constexpr std::byte COMMAND_SET_CHARGE_PUMP_DISABLE{0x10};
+  static inline constexpr uint8_t COMMAND_SET_CHARGE_PUMP{0x8D};
+  static inline constexpr uint8_t COMMAND_SET_CHARGE_PUMP_ENABLE{0x14};
+  static inline constexpr uint8_t COMMAND_SET_CHARGE_PUMP_DISABLE{0x10};
 
  private:
   bool m_enable;
@@ -524,7 +522,7 @@ class SetChargePump {
   explicit SetChargePump(bool enable) : m_enable(enable) {}
 
   void operator()(SSDUI::Context::Context<Pl>* ctx) const {
-    auto data = std::array<std::byte, 2>(
+    auto data = std::array<uint8_t, 2>(
         {COMMAND_SET_CHARGE_PUMP, m_enable ? COMMAND_SET_CHARGE_PUMP_ENABLE
                                            : COMMAND_SET_CHARGE_PUMP_DISABLE});
     ctx->renderer()->command(data);
@@ -545,20 +543,21 @@ class Initializer {
     auto& config = ctx->config();
 
     SetDisplay<Pl>(false)(ctx);
-    SetClockRatioAndFrequency<Pl>(config.clock_ratio,
-                                  config.clock_frequency)(ctx);
-    SetMultiplexRatio<Pl>(config.multiplex_ratio)(ctx);
-    SetDisplayOffset<Pl>(config.display_offset)(ctx);
     SetAddressingMode<Pl>(config.addressing_mode)(ctx);
     SetDisplayStartLine<Pl>(config.start_line)(ctx);
+    SetContrast<Pl>(config.contrast)(ctx);
     SetSegmentRemap<Pl>(config.horizontal_flip)(ctx);
     SetComOutputScanDirection<Pl>(config.vertical_flip)(ctx);
-    SetComPinsHardwareConfiguration<Pl>(config.com_pins)(ctx);
+    SetInvert<Pl>(config.inverse_display)(ctx);
+    SetMultiplexRatio<Pl>(config.multiplex_ratio)(ctx);
+    SetEntireDisplay<Pl>(config.entire_display_on)(ctx);
+    SetDisplayOffset<Pl>(config.display_offset)(ctx);
+    SetClockRatioAndFrequency<Pl>(config.clock_ratio,
+                                  config.clock_frequency)(ctx);
     SetPrechargePeriod<Pl>(config.precharge_phase1,
                            config.precharge_phase2)(ctx);
+    SetComPinsHardwareConfiguration<Pl>(config.com_pins)(ctx);
     SetVCOMH<Pl>(config.vcomh_level)(ctx);
-    SetEntireDisplay<Pl>(config.entire_display_on)(ctx);
-    SetInvert<Pl>(config.inverse_display)(ctx);
     SetChargePump<Pl>(config.charge_pump_enable)(ctx);
     SetDisplay<Pl>(config.display_on)(ctx);
   }

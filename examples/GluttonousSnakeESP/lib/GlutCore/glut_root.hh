@@ -1,10 +1,18 @@
 #pragma once
 
-#include "ssd1306.hh"
-#include "ssdui/context/component.hh"
+#include <ssd1306.hh>
+#include <ssdui/context/component.hh>
 
-class GlutRoot : public SSDUI::Context::BaseComponent<SSD1306::SSD1306> {
+#include "glut_event.hh"
+#include "glut_platform.hh"
+#include "glut_snake.hh"
+#include "ssdui/context/context.hh"
+
+class GlutRoot : public SSDUI::Context::BaseComponent<GlutPlatform> {
  private:
+  GlutEventScanner event_scanner_{};
+  GlutSnake snake_{};
+
  public:
   GlutRoot() = default;
   virtual ~GlutRoot() = default;
@@ -14,7 +22,12 @@ class GlutRoot : public SSDUI::Context::BaseComponent<SSD1306::SSD1306> {
   GlutRoot(GlutRoot&&) = delete;
   GlutRoot& operator=(GlutRoot&&) = delete;
 
-  void operator()(SSDUI::Context::Context<SSD1306::SSD1306>* context) override {
+  void on_mount(SSDUI::Context::Context<GlutPlatform>* context) override {
+    event_scanner_.on_mount(context);
+    snake_.on_mount(context);
+  }
 
+  void operator()(SSDUI::Context::Context<GlutPlatform>* context) override {
+    snake_(context);
   }
 };

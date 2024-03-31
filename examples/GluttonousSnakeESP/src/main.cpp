@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <Wire.h>
 
+#include <array>
 #include <glut_root.hh>
 #include <memory>
 #include <ssd1306.hh>
@@ -11,28 +12,20 @@
 #include <ssdui/context/component.hh>
 #include <ssdui/context/context.hh>
 
-std::unique_ptr<SSD1306::Ticker<SSD1306::SSD1306>> ticker{nullptr};
+#include "glut_platform.hh"
+#include "ssdui/components/geometry.hh"
 
-class TestComponent : public SSDUI::Context::BaseComponent<SSD1306::SSD1306> {
- public:
-  void operator()(SSDUI::Context::Context<SSD1306::SSD1306>* context) override {
-    context->buffer().set(0, 0, std::byte{0xFF});
-    context->buffer().set(1, 0, std::byte{0xFF});
-    context->buffer().set(2, 0, std::byte{0xFF});
-    context->buffer().set(3, 0, std::byte{0xFF});
-    context->buffer().set(4, 0, std::byte{0xFF});
-  }
-};
+std::unique_ptr<SSD1306::Ticker<GlutPlatform>> ticker{nullptr};
 
 void setup() {
   namespace Context = SSDUI::Context;
 
   Serial.begin(115200);
 
-  auto opt = Context::Builder<SSD1306::SSD1306>()
+  auto opt = Context::Builder<GlutPlatform>()
                  .set_config(SSD1306::Config{})
                  .set_renderer(std::make_unique<SSD1306::Renderer>(&Wire, 0x3C))
-                 .set_root(std::make_unique<TestComponent>())
+                 .set_root(std::make_unique<GlutRoot>())
                  .build();
 
   if (!opt.has_value()) {
@@ -42,10 +35,13 @@ void setup() {
 
   auto context = std::move(opt.value());
 
-  SSD1306::Initializer<SSD1306::SSD1306>()(context.get());
+  context->enable_event_manager();
 
-  ticker = Context::Context<SSD1306::SSD1306>::to_ticker<
-      SSD1306::Ticker<SSD1306::SSD1306>>(std::move(context));
+  SSD1306::Initializer<GlutPlatform>()(context.get());
+
+  ticker =
+      Context::Context<GlutPlatform>::to_ticker<SSD1306::Ticker<GlutPlatform>>(
+          std::move(context));
 }
 
 void loop() { delay(100); }

@@ -15,14 +15,14 @@ Renderer::Renderer(TwoWire* wire, uint8_t address, uint8_t sda, uint8_t scl,
 }
 
 Renderer::Renderer(TwoWire* wire, uint8_t address, uint8_t sda, uint8_t scl)
-    : Renderer::Renderer(wire, address, sda, scl, 400000) {}
+    : Renderer::Renderer(wire, address, sda, scl, 100000) {}
 
 Renderer::Renderer(TwoWire* wire, uint8_t address)
     : Renderer(wire, address, 4, 5) {}
 
 Renderer::~Renderer() { wire_->end(); }
 
-std::size_t Renderer::command(std::span<std::byte> data) {
+std::size_t Renderer::command(std::span<uint8_t> data) {
   std::lock_guard<std::mutex> lock(mtx_);
 
   std::size_t bytes_sent = 0;
@@ -32,8 +32,7 @@ std::size_t Renderer::command(std::span<std::byte> data) {
     wire_->write(COMMAND_PREFIX);
 
     auto bytes_send_once_round =
-        wire_->write(reinterpret_cast<uint8_t*>(data.data()) + bytes_sent,
-                     data.size() - bytes_sent);
+        wire_->write(data.data() + bytes_sent, data.size() - bytes_sent);
 
     if (wire_->endTransmission() != 0) {
       break;
@@ -44,7 +43,7 @@ std::size_t Renderer::command(std::span<std::byte> data) {
   return bytes_sent;
 }
 
-std::size_t Renderer::data(std::span<std::byte> data) {
+std::size_t Renderer::data(std::span<uint8_t> data) {
   std::lock_guard<std::mutex> lock(mtx_);
 
   std::size_t bytes_sent = 0;
@@ -54,8 +53,7 @@ std::size_t Renderer::data(std::span<std::byte> data) {
     wire_->write(DATA_PREFIX);
 
     auto bytes_send_once_round =
-        wire_->write(reinterpret_cast<uint8_t*>(data.data()) + bytes_sent,
-                     data.size() - bytes_sent);
+        wire_->write(data.data() + bytes_sent, data.size() - bytes_sent);
 
     if (wire_->endTransmission() != 0) {
       break;

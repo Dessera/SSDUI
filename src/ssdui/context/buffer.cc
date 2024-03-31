@@ -1,14 +1,16 @@
 #include "ssdui/context/buffer.hh"
 
+#include <cstdint>
+
 namespace SSDUI::Context {
 
-Buffer::Buffer(std::size_t width, std::size_t height)
-    : prev_(new std::byte[width * height]),
-      next_(new std::byte[width * height]),
+Buffer::Buffer(std::int16_t width, std::int16_t height)
+    : prev_(new uint8_t[width * height]),
+      next_(new uint8_t[width * height]),
       width_(width),
       height_(height) {
-  std::fill(prev_, prev_ + width * height, std::byte{0});
-  std::fill(next_, next_ + width * height, std::byte{0xFF});
+  std::fill(prev_, prev_ + width * height, uint8_t{0});
+  std::fill(next_, next_ + width * height, uint8_t{0xFF});
 }
 
 Buffer::~Buffer() {
@@ -17,8 +19,8 @@ Buffer::~Buffer() {
 }
 
 Buffer::Buffer(const Buffer& other)
-    : prev_(new std::byte[other.width_ * other.height_]),
-      next_(new std::byte[other.width_ * other.height_]),
+    : prev_(new uint8_t[other.width_ * other.height_]),
+      next_(new uint8_t[other.width_ * other.height_]),
       width_(other.width_),
       height_(other.height_) {
   std::copy(other.prev_, other.prev_ + width_ * height_, prev_);
@@ -44,8 +46,8 @@ Buffer& Buffer::operator=(const Buffer& other) {
   delete[] prev_;
   delete[] next_;
 
-  prev_ = new std::byte[other.width_ * other.height_];
-  next_ = new std::byte[other.width_ * other.height_];
+  prev_ = new uint8_t[other.width_ * other.height_];
+  next_ = new uint8_t[other.width_ * other.height_];
   width_ = other.width_;
   height_ = other.height_;
 

@@ -36,8 +36,8 @@ class Renderer {
   Renderer(Renderer&&) = delete;
   Renderer& operator=(Renderer&&) = delete;
 
-  std::size_t command(std::span<std::byte> data);
-  std::size_t data(std::span<std::byte> data);
+  std::size_t command(std::span<uint8_t> data);
+  std::size_t data(std::span<uint8_t> data);
 };
 
 }  // namespace SSD1306

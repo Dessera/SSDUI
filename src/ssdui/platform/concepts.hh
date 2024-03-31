@@ -19,7 +19,7 @@
 namespace SSDUI::Platform {
 
 template <typename Re>
-concept IsRenderer = requires(Re rend, std::span<std::byte> data) {
+concept IsRenderer = requires(Re rend, std::span<uint8_t> data) {
   { rend.command(data) } -> std::same_as<std::size_t>;
   { rend.data(data) } -> std::same_as<std::size_t>;
 };

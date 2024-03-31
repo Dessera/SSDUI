@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "HardwareSerial.h"
+#include "esp32-hal.h"
 #include "ssd1306.hh"
 #include "ssd1306_command.hh"
 #include "ssdui/context/context.hh"
@@ -39,9 +40,11 @@ class Ticker {
         auto sequence = context_->buffer().next().subspan(
             region.origin.x + region.origin.y * context_->buffer().width(),
             region.size.x);
+
         SetColumnAddress<Pl>(region.origin.x, region.origin.x + region.size.x -
                                                   1)(context_.get());
-        SetPageAddress<Pl>(region.origin.y, region.origin.y)(context_.get());
+        SetPageAddress<Pl>(region.origin.y,
+                           region.origin.y + region.size.y - 1)(context_.get());
 
         context_->renderer()->data(sequence);
       }
@@ -62,7 +65,7 @@ class Ticker {
 
   std::vector<SSDUI::Geometry::Rectangle<int32_t>> _get_dirty_rectangles(
       const SSDUI::Context::Buffer& buffer) {
-    std::vector<SSDUI::Geometry::Rectangle<int32_t>> dirty_regions;
+    std::vector<SSDUI::Geometry::Rectangle<int32_t>> dirty_regions{};
     auto previous = buffer.prev();
     auto next = buffer.next();
     auto width = buffer.width();
@@ -87,6 +90,12 @@ class Ticker {
  public:
   explicit Ticker(std::unique_ptr<SSDUIContext> context)
       : context_(std::move(context)), ticker_thread_([this] { _ticker(); }) {}
+
+  ~Ticker() {
+    if (ticker_thread_.joinable()) {
+      ticker_thread_.join();
+    }
+  }
 };
 
 }  // namespace SSD1306

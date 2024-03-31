@@ -10,6 +10,8 @@
             "includePath": [
                 "/data/projects/SSDUI/examples/GluttonousSnakeESP/include",
                 "/data/projects/SSDUI/examples/GluttonousSnakeESP/src",
+                "/data/projects/SSDUI/examples/GluttonousSnakeESP/lib/GlutCore",
+                "/data/projects/SSDUI/examples/GluttonousSnakeESP/lib/OneButton/src",
                 "/data/projects/SSDUI/examples/GluttonousSnakeESP/lib/SSD1306/src",
                 "/home/dessera/.platformio/packages/framework-arduinoespressif32/libraries/Wire/src",
                 "/data/projects/SSDUI/examples/GluttonousSnakeESP/.pio/libdeps/gluttonous_snake_esp/SSDUI/src",
@@ -239,6 +241,8 @@
                 "path": [
                     "/data/projects/SSDUI/examples/GluttonousSnakeESP/include",
                     "/data/projects/SSDUI/examples/GluttonousSnakeESP/src",
+                    "/data/projects/SSDUI/examples/GluttonousSnakeESP/lib/GlutCore",
+                    "/data/projects/SSDUI/examples/GluttonousSnakeESP/lib/OneButton/src",
                     "/data/projects/SSDUI/examples/GluttonousSnakeESP/lib/SSD1306/src",
                     "/home/dessera/.platformio/packages/framework-arduinoespressif32/libraries/Wire/src",
                     "/data/projects/SSDUI/examples/GluttonousSnakeESP/.pio/libdeps/gluttonous_snake_esp/SSDUI/src",

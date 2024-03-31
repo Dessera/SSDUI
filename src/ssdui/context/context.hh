@@ -106,6 +106,8 @@ class Context {
   static std::unique_ptr<Ti> to_ticker(std::unique_ptr<Context<Pl>> context) {
     return std::make_unique<Ti>(std::move(context));
   }
+
+  void enable_event_manager() { event_manager_.enable(this); }
 };
 
 template <typename Pl>

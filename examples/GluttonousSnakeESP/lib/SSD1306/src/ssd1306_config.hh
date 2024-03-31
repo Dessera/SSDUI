@@ -46,7 +46,7 @@ struct Config {
   static constexpr bool DEFAULT_HORIZONTAL_FLIP = false;
   static constexpr bool DEFAULT_VERTICAL_FLIP = false;
   static constexpr uint8_t DEFAULT_DISPLAY_OFFSET = 0;
-  static constexpr uint8_t DEFAULT_MULTIPLEX_RATIO = 0x63;
+  static constexpr uint8_t DEFAULT_MULTIPLEX_RATIO = 63;
   static constexpr bool DEFAULT_CHARGE_PUMP_ENABLE = true;
   static constexpr uint8_t DEFAULT_FRAME_RATE = 30;
 
