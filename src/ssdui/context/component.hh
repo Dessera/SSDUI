@@ -13,11 +13,17 @@ class Context;
 template <typename Pl, typename Cm>
 concept IsComponent = requires(Cm comp, Context<Pl> *ctx) {
   { comp(ctx) };
+
+  /**
+   * @brief 钩子函数，由Ticker调用
+   */
+  { comp.on_mount(ctx) };
 };
 
 template <typename Pl>
 class BaseComponent {
   virtual void operator()(Context<Pl> *ctx) = 0;
+  virtual void on_mount(Context<Pl> *ctx) {}
 };
 
 template <typename Pl, IsComponent<Pl> Cm>

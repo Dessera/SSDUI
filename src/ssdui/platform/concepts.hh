@@ -11,8 +11,10 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <ssdui/common/concepts.hh>
-#include <ssdui/common/span.hh>
+
+#include "ssdui/common/concepts.hh"
+#include "ssdui/common/span.hh"
+#include "ssdui/platform/config.hh"
 
 namespace SSDUI::Platform {
 
@@ -20,15 +22,6 @@ template <typename Re>
 concept IsRenderer = requires(Re rend, std::span<uint8_t> data) {
   { rend.command(data) } -> std::same_as<std::size_t>;
   { rend.data(data) } -> std::same_as<std::size_t>;
-};
-
-template <typename Co>
-concept IsConfig = requires(Co config) {
-  { config.width } -> std::same_as<std::size_t&>;
-  { config.height } -> std::same_as<std::size_t&>;
-  { config.fps } -> std::same_as<std::size_t&>;
-  { config.vertical_flip } -> std::same_as<bool&>;
-  { config.horizontal_flip } -> std::same_as<bool&>;
 };
 
 template <typename Pl>
@@ -42,6 +35,16 @@ concept IsPlatform = requires {
    * @brief 平台的配置信息类型
    */
   requires IsConfig<typename Pl::Config>;
-};
 
+  /**
+   * @brief 平台的事件类型
+   */
+  requires std::is_enum_v<typename Pl::Event>;
+
+  /**
+   * @brief 平台的帧计时器类型，负责真正的渲染线程
+   * TODO: 该类型，以及Buffer类型，实际上都应当属于渲染器的一部分
+   */
+  typename Pl::Ticker;
+};
 }  // namespace SSDUI::Platform

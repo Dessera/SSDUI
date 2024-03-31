@@ -1,32 +1,34 @@
 #pragma once
 
 #include <cstddef>
+#include <memory>
 
 #include "ssdui/common/span.hh"
 namespace SSDUI::Context {
 
 class Buffer {
  private:
-  std::span<std::byte> prev_;
-  std::span<std::byte> next_;
+  std::byte* prev_;
+  std::byte* next_;
 
   std::size_t width_;
   std::size_t height_;
 
  public:
-  Buffer(std::size_t width, std::size_t height)
-      : prev_(new std::byte[width * height], width * height),
-        next_(new std::byte[width * height], width * height),
-        width_(width),
-        height_(height) {}
+  Buffer(std::size_t width, std::size_t height);
+  ~Buffer();
 
-  ~Buffer() {
-    delete[] prev_.data();
-    delete[] next_.data();
+  Buffer(const Buffer& other);
+  Buffer& operator=(const Buffer& other);
+  Buffer(Buffer&& other) noexcept;
+  Buffer& operator=(Buffer&& other) noexcept;
+
+  [[nodiscard]] std::span<std::byte> prev() const {
+    return {prev_, width_ * height_};
   }
-
-  std::span<std::byte> prev() { return prev_; }
-  std::span<std::byte> next() { return next_; }
+  [[nodiscard]] std::span<std::byte> next() const {
+    return {next_, width_ * height_};
+  }
 
   [[nodiscard]] std::size_t width() const { return width_; }
   [[nodiscard]] std::size_t height() const { return height_; }

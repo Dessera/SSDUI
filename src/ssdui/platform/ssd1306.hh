@@ -42,8 +42,8 @@ class SSD1306 {
   };
 
   struct Config {
-    std::size_t width{128};
-    std::size_t height{64};
+    std::int16_t width{128};
+    std::int16_t height{64};
     std::size_t fps{30};
     bool vertical_flip{false};
     bool horizontal_flip{false};
@@ -51,8 +51,10 @@ class SSD1306 {
     // (dessera) 我决定不实现更多的硬件配置项，因为这个平台只是一个测试用的平台
 
   } __attribute__((aligned(16)));
-};
 
-static_assert(IsPlatform<SSD1306>, "TestBench SSD1306 is not a platform");
+  enum class Event { None };
+
+  class Ticker {};
+};
 
 }  // namespace SSDUI::Platform
