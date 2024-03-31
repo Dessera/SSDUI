@@ -19,7 +19,7 @@ concept IsConfig = requires(Co config) {
 
   {
     std::remove_reference_t<decltype(config.fps)>{}
-  } -> std::same_as<std::size_t>;
+  } -> std::same_as<std::int16_t>;
 
   {
     std::remove_reference_t<decltype(config.vertical_flip)>{}

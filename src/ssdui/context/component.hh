@@ -13,10 +13,6 @@ class Context;
 template <typename Pl, typename Cm>
 concept IsComponent = requires(Cm comp, Context<Pl> *ctx) {
   { comp(ctx) };
-
-  /**
-   * @brief 钩子函数，由Ticker调用
-   */
   { comp.on_mount(ctx) };
 };
 

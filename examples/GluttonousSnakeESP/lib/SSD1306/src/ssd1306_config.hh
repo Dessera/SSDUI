@@ -48,7 +48,7 @@ struct Config {
   static constexpr uint8_t DEFAULT_DISPLAY_OFFSET = 0;
   static constexpr uint8_t DEFAULT_MULTIPLEX_RATIO = 63;
   static constexpr bool DEFAULT_CHARGE_PUMP_ENABLE = true;
-  static constexpr uint8_t DEFAULT_FRAME_RATE = 30;
+  static constexpr int16_t DEFAULT_FRAME_RATE = 30;
 
   int16_t width{DEFAULT_WIDTH};
   int16_t height{DEFAULT_HEIGHT};
@@ -69,7 +69,7 @@ struct Config {
   uint8_t display_offset{DEFAULT_DISPLAY_OFFSET};
   ComPinsConfig com_pins{DEFAULT_COM_PINS};
   bool charge_pump_enable{DEFAULT_CHARGE_PUMP_ENABLE};
-  std::size_t fps{DEFAULT_FRAME_RATE};
+  int16_t fps{DEFAULT_FRAME_RATE};
 } __attribute__((aligned(32)));
 
 }  // namespace SSD1306
