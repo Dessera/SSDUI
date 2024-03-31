@@ -2,16 +2,14 @@
 
 #include <cstdint>
 #include <memory>
+#include <ssdui/context/context.hh>
+#include <ssdui/geometry/rectangle.hh>
+#include <ssdui/platform/concepts.hh>
 #include <thread>
 #include <vector>
 
-#include "HardwareSerial.h"
-#include "esp32-hal.h"
 #include "ssd1306.hh"
 #include "ssd1306_command.hh"
-#include "ssdui/context/context.hh"
-#include "ssdui/geometry/rectangle.hh"
-#include "ssdui/platform/concepts.hh"
 
 namespace SSD1306 {
 

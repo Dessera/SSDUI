@@ -1,14 +1,11 @@
 #pragma once
 
 #include <array>
-#include <cstddef>
 #include <cstdint>
+#include <ssdui/context/component.hh>
+#include <ssdui/platform/concepts.hh>
 
-#include "HardwareSerial.h"
-#include "esp32-hal.h"
 #include "ssd1306.hh"
-#include "ssdui/context/component.hh"
-#include "ssdui/platform/concepts.hh"
 namespace SSD1306 {
 
 /**

@@ -1,10 +1,12 @@
 #pragma once
 
+#include <condition_variable>
 #include <cstdint>
 #include <thread>
 #include <vector>
 
 #include "HardwareSerial.h"
+#include "glut_food.hh"
 #include "glut_platform.hh"
 #include "ssdui/components/geometry.hh"
 #include "ssdui/context/context.hh"
@@ -22,7 +24,9 @@ class GlutSnake : public SSDUI::Context::BaseComponent<GlutPlatform> {
 
   std::thread move_thread_;
 
-  void _move_handler() {
+  GlutFood food_{};
+
+  void _move_handler(SSDUI::Context::Context<GlutPlatform>* context) {
     while (true) {
       auto head = snake.front();
       snake.pop_back();
@@ -43,6 +47,13 @@ class GlutSnake : public SSDUI::Context::BaseComponent<GlutPlatform> {
       }
 
       snake.insert(snake.begin(), head);
+
+      // if snake get food, trigger FoodEaten
+      auto [food_x, food_y] = food_.get_position();
+      if (head.x == food_x && head.y == food_y) {
+        context->event_manager().trigger_event(GlutEvent::FoodEaten);
+        snake.push_back(snake.back());
+      }
 
       std::this_thread::sleep_for(std::chrono::milliseconds(300));
     }
@@ -71,7 +82,10 @@ class GlutSnake : public SSDUI::Context::BaseComponent<GlutPlatform> {
           this->direction_ = GlutSnakeDirection::Right;
         });
 
-    move_thread_ = std::thread(&GlutSnake::_move_handler, this);
+    // move_thread_ = std::thread(&GlutSnake::_move_handler, this);
+    move_thread_ = std::thread(&GlutSnake::_move_handler, this, context);
+
+    food_.on_mount(context);
   }
 
   void operator()(SSDUI::Context::Context<GlutPlatform>* context) override {
@@ -80,5 +94,7 @@ class GlutSnake : public SSDUI::Context::BaseComponent<GlutPlatform> {
       SSDUI::Components::Rectangle<GlutPlatform>{
           {{point.x, point.y}, {SNACK_SIZE, SNACK_SIZE}}}(context);
     }
+
+    food_(context);
   }
 };

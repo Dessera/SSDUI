@@ -4,13 +4,25 @@
 #include <ssd1306_renderer.hh>
 
 enum class GlutEvent {
+
+  // 控制事件
   KeyUp,
   KeyDown,
   KeyLeft,
   KeyRight,
-  // KEY_DOWN,
-  // KEY_LEFT,
-  // KEY_RIGHT,
+
+  // 游戏全局
+  GameStart,
+  GameOver,
+
+  // 内部触发
+  FoodEaten,
+};
+
+enum class GlutState {
+  Ready,
+  Running,
+  Failed,
 };
 
 class GlutPlatform {

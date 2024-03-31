@@ -1,11 +1,5 @@
 #pragma once
 
-// #include <Wire.h>
-
-// #include <mutex>
-// #include <ssdui.hh>
-
-#include <cstddef>
 #include <cstdint>
 namespace SSD1306 {
 

@@ -4,6 +4,7 @@
 #include <ssdui/context/component.hh>
 
 #include "glut_event.hh"
+#include "glut_food.hh"
 #include "glut_platform.hh"
 #include "glut_snake.hh"
 #include "ssdui/context/context.hh"

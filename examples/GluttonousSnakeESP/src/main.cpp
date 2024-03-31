@@ -23,7 +23,8 @@ void setup() {
   Serial.begin(115200);
 
   auto opt = Context::Builder<GlutPlatform>()
-                 .set_config(SSD1306::Config{})
+                 .set_config(SSD1306::Config{.horizontal_flip = true,
+                                             .vertical_flip = true})
                  .set_renderer(std::make_unique<SSD1306::Renderer>(&Wire, 0x3C))
                  .set_root(std::make_unique<GlutRoot>())
                  .build();
