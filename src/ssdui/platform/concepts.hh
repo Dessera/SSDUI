@@ -27,6 +27,12 @@ concept IsRenderer = requires(Re rend, std::span<uint8_t> data) {
 template <typename Pl>
 concept IsPlatform = requires {
   /**
+   * @brief Store全局数据的类型
+   *        参考前端的Store概念，用于存储全局数据
+   */
+  typename Pl::Store;
+
+  /**
    * @brief 平台的渲染器类型
    */
   requires IsRenderer<typename Pl::Renderer>;
@@ -53,6 +59,8 @@ concept IsPlatform = requires {
  * TODO:
  * 如何界定派生关系？现在我认为，只要二者的配置类型完全相同，就可以证明二者至少在代码层面可以兼容。
  * TODO: 在渲染器接口进行大更改时，可能需要重新考虑这个问题。
+ * TODO:
+ * 并且，我隐约地区分出了平台内部类型的区别，即强平台绑定类型和弱平台绑定类型，如何更好的区分这两种类型？
  */
 template <typename BasePl, typename DerivedPl>
 concept IsPlatformDerivedFrom = requires {

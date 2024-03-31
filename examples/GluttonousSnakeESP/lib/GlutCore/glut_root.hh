@@ -13,6 +13,7 @@ class GlutRoot : public SSDUI::Context::BaseComponent<GlutPlatform> {
  private:
   GlutEventScanner event_scanner_{};
   GlutSnake snake_{};
+  GlutFood food_{};
 
  public:
   GlutRoot() = default;
@@ -26,9 +27,11 @@ class GlutRoot : public SSDUI::Context::BaseComponent<GlutPlatform> {
   void on_mount(SSDUI::Context::Context<GlutPlatform>* context) override {
     event_scanner_.on_mount(context);
     snake_.on_mount(context);
+    food_.on_mount(context);
   }
 
   void operator()(SSDUI::Context::Context<GlutPlatform>* context) override {
     snake_(context);
+    food_(context);
   }
 };

@@ -24,8 +24,6 @@ class GlutSnake : public SSDUI::Context::BaseComponent<GlutPlatform> {
 
   std::thread move_thread_;
 
-  GlutFood food_{};
-
   void _move_handler(SSDUI::Context::Context<GlutPlatform>* context) {
     while (true) {
       auto head = snake.front();
@@ -49,7 +47,7 @@ class GlutSnake : public SSDUI::Context::BaseComponent<GlutPlatform> {
       snake.insert(snake.begin(), head);
 
       // if snake get food, trigger FoodEaten
-      auto [food_x, food_y] = food_.get_position();
+      auto [food_x, food_y] = context->store().food;
       if (head.x == food_x && head.y == food_y) {
         context->event_manager().trigger_event(GlutEvent::FoodEaten);
         snake.push_back(snake.back());
@@ -68,24 +66,20 @@ class GlutSnake : public SSDUI::Context::BaseComponent<GlutPlatform> {
   }
 
   void on_mount(SSDUI::Context::Context<GlutPlatform>* context) override {
-    context->event_manager().register_event(
-        GlutEvent::KeyUp, "key_up",
-        [this](auto* /*ctx*/) { this->direction_ = GlutSnakeDirection::Up; });
-    context->event_manager().register_event(
-        GlutEvent::KeyDown, "key_down",
-        [this](auto* /*ctx*/) { this->direction_ = GlutSnakeDirection::Down; });
-    context->event_manager().register_event(
-        GlutEvent::KeyLeft, "key_left",
-        [this](auto* /*ctx*/) { this->direction_ = GlutSnakeDirection::Left; });
-    context->event_manager().register_event(
-        GlutEvent::KeyRight, "key_right", [this](auto* /*ctx*/) {
-          this->direction_ = GlutSnakeDirection::Right;
-        });
+    context->event_manager().register_event(GlutEvent::KeyUp, [this](auto) {
+      this->direction_ = GlutSnakeDirection::Up;
+    });
+    context->event_manager().register_event(GlutEvent::KeyDown, [this](auto) {
+      this->direction_ = GlutSnakeDirection::Down;
+    });
+    context->event_manager().register_event(GlutEvent::KeyLeft, [this](auto) {
+      this->direction_ = GlutSnakeDirection::Left;
+    });
+    context->event_manager().register_event(GlutEvent::KeyRight, [this](auto) {
+      this->direction_ = GlutSnakeDirection::Right;
+    });
 
-    // move_thread_ = std::thread(&GlutSnake::_move_handler, this);
     move_thread_ = std::thread(&GlutSnake::_move_handler, this, context);
-
-    food_.on_mount(context);
   }
 
   void operator()(SSDUI::Context::Context<GlutPlatform>* context) override {
@@ -94,7 +88,5 @@ class GlutSnake : public SSDUI::Context::BaseComponent<GlutPlatform> {
       SSDUI::Components::Rectangle<GlutPlatform>{
           {{point.x, point.y}, {SNACK_SIZE, SNACK_SIZE}}}(context);
     }
-
-    food_(context);
   }
 };

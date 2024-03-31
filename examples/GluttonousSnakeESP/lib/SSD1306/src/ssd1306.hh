@@ -10,6 +10,8 @@ class SSD1306 {
   using Config = ::SSD1306::Config;
 
   enum class Event { None };
+
+  struct Store {};
 };
 
 }  // namespace SSD1306

@@ -5,6 +5,7 @@
  *
  *  事件管理器负责管理事件的注册和触发
  */
+#include <any>
 #include <condition_variable>
 #include <cstdint>
 #include <functional>
@@ -24,6 +25,13 @@ class Context;
 
 template <typename Pl>
   requires Platform::IsPlatform<Pl>
+struct EventPayload {
+  typename Pl::Event type;
+  std::any data;
+};
+
+template <typename Pl>
+  requires Platform::IsPlatform<Pl>
 class EventManager {
  public:
   using Platform = Pl;
@@ -32,10 +40,10 @@ class EventManager {
  private:
   std::unordered_map<
       typename Pl::Event,
-      std::unordered_map<std::string, std::function<void(Context<Pl>*)>>>
+      std::vector<std::function<void(Context<Pl>*, const std::any&)>>>
       listeners_{};
 
-  std::queue<typename Pl::Event> event_queue_{};
+  std::queue<EventPayload<Pl>> event_queue_{};
   std::thread event_thread_;
   std::mutex lock_;
   std::condition_variable event_cv_;
@@ -48,8 +56,8 @@ class EventManager {
       auto event = event_queue_.front();
       event_queue_.pop();
 
-      for (const auto& [name, listener] : listeners_[event]) {
-        listener(ctx);
+      for (const auto& listener : listeners_[event.type]) {
+        listener(ctx, event.data);
       }
     }
   }
@@ -77,11 +85,15 @@ class EventManager {
    * @param event 事件
    * @param listener 监听器
    */
-  void register_event(Event event, std::string name,
-                      std::function<void(Context<Pl>*)> listener) {
-    if (listeners_[event].find(name) == listeners_[event].end()) {
-      listeners_[event][name] = std::move(listener);
-    }
+  void register_event(Event event, std::function<void(Context<Pl>*)> listener) {
+    listeners_[event].push_back(
+        [listener](Context<Pl>* ctx, const std::any&) { listener(ctx); });
+  }
+
+  void register_event(
+      Event event,
+      std::function<void(Context<Pl>*, const std::any&)> listener) {
+    listeners_[event].push_back(listener);
   }
 
   /**
@@ -91,7 +103,15 @@ class EventManager {
    */
   void trigger_event(Event event) {
     std::lock_guard<std::mutex> lock(lock_);
-    event_queue_.push(event);
+    // event_queue_.push(event);
+    // event_cv_.notify_one();
+    event_queue_.push(EventPayload<Pl>{.type = event, .data = std::any{}});
+    event_cv_.notify_one();
+  }
+
+  void trigger_event(Event event, const std::any& data) {
+    std::lock_guard<std::mutex> lock(lock_);
+    event_queue_.push(EventPayload<Pl>{.type = event, .data = data});
     event_cv_.notify_one();
   }
 

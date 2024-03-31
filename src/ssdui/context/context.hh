@@ -22,6 +22,7 @@ class Context {
 
   using Renderer = typename Platform::Renderer;
   using Config = typename Platform::Config;
+  using Store = typename Platform::Store;
 
  private:
   /**
@@ -49,6 +50,11 @@ class Context {
    * @brief 事件管理器，用于处理事件
    */
   EventManager<Pl> event_manager_{};
+
+  /**
+   * @brief Store的实例，管理全局数据
+   */
+  Store store_{};
 
   Context(std::unique_ptr<Renderer> renderer, Config config,
           std::unique_ptr<BaseComponent<Pl>> root)
@@ -108,6 +114,8 @@ class Context {
   }
 
   void enable_event_manager() { event_manager_.enable(this); }
+
+  Store& store() { return store_; }
 };
 
 template <typename Pl>
