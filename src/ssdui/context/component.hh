@@ -22,6 +22,7 @@ concept IsComponent = requires(Cm comp, Context<Pl> *ctx) {
 
 template <typename Pl>
 class BaseComponent {
+ public:
   virtual void operator()(Context<Pl> *ctx) = 0;
   virtual void on_mount(Context<Pl> *ctx) {}
 };

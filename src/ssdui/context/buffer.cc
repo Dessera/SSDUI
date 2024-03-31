@@ -6,7 +6,10 @@ Buffer::Buffer(std::size_t width, std::size_t height)
     : prev_(new std::byte[width * height]),
       next_(new std::byte[width * height]),
       width_(width),
-      height_(height) {}
+      height_(height) {
+  std::fill(prev_, prev_ + width * height, std::byte{0});
+  std::fill(next_, next_ + width * height, std::byte{0xFF});
+}
 
 Buffer::~Buffer() {
   delete[] prev_;

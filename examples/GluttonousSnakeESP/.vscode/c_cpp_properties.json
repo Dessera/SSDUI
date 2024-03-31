@@ -10,8 +10,9 @@
             "includePath": [
                 "/data/projects/SSDUI/examples/GluttonousSnakeESP/include",
                 "/data/projects/SSDUI/examples/GluttonousSnakeESP/src",
-                "/data/projects/SSDUI/examples/GluttonousSnakeESP/.pio/libdeps/gluttonous_snake_esp/SSDUI/src",
+                "/data/projects/SSDUI/examples/GluttonousSnakeESP/lib/SSD1306/src",
                 "/home/dessera/.platformio/packages/framework-arduinoespressif32/libraries/Wire/src",
+                "/data/projects/SSDUI/examples/GluttonousSnakeESP/.pio/libdeps/gluttonous_snake_esp/SSDUI/src",
                 "/home/dessera/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/newlib/platform_include",
                 "/home/dessera/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/freertos/include",
                 "/home/dessera/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/freertos/include/esp_additions/freertos",
@@ -238,8 +239,9 @@
                 "path": [
                     "/data/projects/SSDUI/examples/GluttonousSnakeESP/include",
                     "/data/projects/SSDUI/examples/GluttonousSnakeESP/src",
-                    "/data/projects/SSDUI/examples/GluttonousSnakeESP/.pio/libdeps/gluttonous_snake_esp/SSDUI/src",
+                    "/data/projects/SSDUI/examples/GluttonousSnakeESP/lib/SSD1306/src",
                     "/home/dessera/.platformio/packages/framework-arduinoespressif32/libraries/Wire/src",
+                    "/data/projects/SSDUI/examples/GluttonousSnakeESP/.pio/libdeps/gluttonous_snake_esp/SSDUI/src",
                     "/home/dessera/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/newlib/platform_include",
                     "/home/dessera/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/freertos/include",
                     "/home/dessera/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/freertos/include/esp_additions/freertos",

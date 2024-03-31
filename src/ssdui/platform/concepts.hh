@@ -19,7 +19,7 @@
 namespace SSDUI::Platform {
 
 template <typename Re>
-concept IsRenderer = requires(Re rend, std::span<uint8_t> data) {
+concept IsRenderer = requires(Re rend, std::span<std::byte> data) {
   { rend.command(data) } -> std::same_as<std::size_t>;
   { rend.data(data) } -> std::same_as<std::size_t>;
 };
@@ -45,6 +45,6 @@ concept IsPlatform = requires {
    * @brief 平台的帧计时器类型，负责真正的渲染线程
    * TODO: 该类型，以及Buffer类型，实际上都应当属于渲染器的一部分
    */
-  typename Pl::Ticker;
+  // typename Pl::Ticker;
 };
 }  // namespace SSDUI::Platform

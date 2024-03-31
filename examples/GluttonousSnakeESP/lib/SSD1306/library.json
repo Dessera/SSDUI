@@ -1,7 +1,7 @@
 {
-  "name": "SSDUI",
+  "name": "SSD1306",
   "keywords": "oled",
-  "description": "SSDUI Supports for SSD1306 OLED display. A example implementation of SSDUI for SSD1306 OLED display.",
+  "description": "(Aim to be) A generic UI framework for embedded device, highly depends on C++20 & standard library",
   "version": "0.0.0",
   "authors": {
     "name": "Dessera",

@@ -44,6 +44,10 @@ class span {
   constexpr T* cbegin() const noexcept { return data_; }
   constexpr T* cend() const noexcept { return data_ + size_; }
 
+  constexpr span<T> subspan(size_type offset, size_type count) const noexcept {
+    return {data_ + offset, count};
+  }
+
  private:
   T* data_;
   size_type size_;

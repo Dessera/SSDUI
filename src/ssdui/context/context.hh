@@ -78,7 +78,7 @@ class Context {
    *
    * @return Config
    */
-  Config config() { return config_; }
+  Config& config() { return config_; }
 
   /**
    * @brief 获取根组件
@@ -101,8 +101,10 @@ class Context {
    */
   EventManager<Pl>& event_manager() { return event_manager_; }
 
-  static Pl::Ticker to_ticker(std::unique_ptr<Context<Pl>> context) {
-    return typename Pl::Ticker{context};
+  // TODO(dessera): 应当有一个更好的方法来处理这个问题（Ticker的包含关系）
+  template <typename Ti>
+  static std::unique_ptr<Ti> to_ticker(std::unique_ptr<Context<Pl>> context) {
+    return std::make_unique<Ti>(std::move(context));
   }
 };
 

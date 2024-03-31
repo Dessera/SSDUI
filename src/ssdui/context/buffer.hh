@@ -34,6 +34,17 @@ class Buffer {
   [[nodiscard]] std::size_t height() const { return height_; }
 
   void swap() noexcept { std::swap(prev_, next_); }
+  void clear() noexcept {
+    std::fill(next_, next_ + width_ * height_, std::byte{0});
+  }
+
+  void set(std::size_t x, std::size_t y, std::byte value) {
+    next_[x + y * width_] = value;
+  }
+
+  void mixin(std::size_t x, std::size_t y, std::byte value) {
+    next_[x + y * width_] |= value;
+  }
 };
 
 }  // namespace SSDUI::Context

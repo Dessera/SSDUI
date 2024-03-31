@@ -25,6 +25,10 @@ class Context;
 template <typename Pl>
   requires Platform::IsPlatform<Pl>
 class EventManager {
+ public:
+  using Platform = Pl;
+  using Event = typename Platform::Event;
+
  private:
   std::unordered_map<
       typename Pl::Event,
@@ -73,7 +77,7 @@ class EventManager {
    * @param event 事件
    * @param listener 监听器
    */
-  void register_event(Pl::Event event, std::string name,
+  void register_event(Event event, std::string name,
                       std::function<void(Context<Pl>*)> listener) {
     if (listeners_[event].find(name) == listeners_[event].end()) {
       listeners_[event][name] = std::move(listener);
@@ -85,7 +89,7 @@ class EventManager {
    *
    * @param event 事件
    */
-  void trigger_event(Pl::Event event) {
+  void trigger_event(Event event) {
     std::lock_guard<std::mutex> lock(lock_);
     event_queue_.push(event);
     event_cv_.notify_one();
