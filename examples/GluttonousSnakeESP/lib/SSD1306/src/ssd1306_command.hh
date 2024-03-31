@@ -7,11 +7,14 @@
 #include "esp32-hal.h"
 #include "ssd1306.hh"
 #include "ssdui/context/component.hh"
+#include "ssdui/platform/concepts.hh"
 namespace SSD1306 {
 
 /**
  * @brief 设置起始列，用于页寻址模式
  */
+template <typename Pl>
+  requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class SetStartColumn {
  public:
   static inline constexpr std::byte COMMAND_SET_START_COLUMN_LOW{0x00};
@@ -24,7 +27,7 @@ class SetStartColumn {
  public:
   explicit SetStartColumn(int16_t column) : m_column(column) {}
 
-  void operator()(SSDUI::Context::Context<SSD1306>* ctx) const {
+  void operator()(SSDUI::Context::Context<Pl>* ctx) const {
     // context::RuntimeConfig& config = ctx->config();
     auto& config = ctx->config();
 
@@ -47,6 +50,8 @@ class SetStartColumn {
 /**
  * @brief 设置起始页，用于页寻址模式
  */
+template <typename Pl>
+  requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class SetStartPage {
  public:
   static inline constexpr std::byte COMMAND_SET_START_PAGE{0xB0};
@@ -57,7 +62,7 @@ class SetStartPage {
  public:
   explicit SetStartPage(uint8_t page) : m_page(page) {}
 
-  void operator()(SSDUI::Context::Context<SSD1306>* ctx) const {
+  void operator()(SSDUI::Context::Context<Pl>* ctx) const {
     auto& config = ctx->config();
 
     if (config.addressing_mode != AddressMode::PAGE) {
@@ -78,6 +83,8 @@ class SetStartPage {
 /**
  * @brief 设置寻址模式
  */
+template <typename Pl>
+  requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class SetAddressingMode {
  public:
   static inline constexpr std::byte COMMAND_SET_ADDRESSING_MODE{0x20};
@@ -88,7 +95,7 @@ class SetAddressingMode {
  public:
   explicit SetAddressingMode(AddressMode mode) : m_mode(mode) {}
 
-  void operator()(SSDUI::Context::Context<SSD1306>* ctx) const {
+  void operator()(SSDUI::Context::Context<Pl>* ctx) const {
     auto data = std::array<std::byte, 2>(
         {COMMAND_SET_ADDRESSING_MODE, static_cast<std::byte>(m_mode)});
     ctx->renderer()->command(data);
@@ -98,6 +105,8 @@ class SetAddressingMode {
 /**
  * @brief 设置列地址范围，用于水平寻址模式和垂直寻址模式
  */
+template <typename Pl>
+  requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class SetColumnAddress {
  public:
   static inline constexpr std::byte COMMAND_SET_COLUMN_ADDRESS{0x21};
@@ -110,12 +119,12 @@ class SetColumnAddress {
   explicit SetColumnAddress(int16_t start_column, int16_t end_column)
       : m_start_column(start_column), m_end_column(end_column) {}
 
-  void operator()(SSDUI::Context::Context<SSD1306>* ctx) const {
+  void operator()(SSDUI::Context::Context<Pl>* ctx) const {
     auto& config = ctx->config();
 
     if (config.addressing_mode == AddressMode::PAGE) {
       // downcast to SetStartColumn
-      SetStartColumn(m_start_column).operator()(ctx);
+      SetStartColumn<Pl>(m_start_column).operator()(ctx);
     }
 
     if (m_start_column >= config.width || m_end_column >= config.width ||
@@ -134,6 +143,8 @@ class SetColumnAddress {
 /**
  * @brief 设置页地址范围，用于水平寻址模式和垂直寻址模式
  */
+template <typename Pl>
+  requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class SetPageAddress {
  public:
   static inline constexpr std::byte COMMAND_SET_PAGE_ADDRESS{0x22};
@@ -146,12 +157,12 @@ class SetPageAddress {
   explicit SetPageAddress(int16_t start_page, int16_t end_page)
       : m_start_page(start_page), m_end_page(end_page) {}
 
-  void operator()(SSDUI::Context::Context<SSD1306>* ctx) const {
+  void operator()(SSDUI::Context::Context<Pl>* ctx) const {
     auto& config = ctx->config();
 
     if (config.addressing_mode == AddressMode::PAGE) {
       // downcast to SetStartPage
-      SetStartPage(m_start_page).operator()(ctx);
+      SetStartPage<Pl>(m_start_page).operator()(ctx);
     }
 
     // TODO(dessera): 页大小统一指定
@@ -170,11 +181,13 @@ class SetPageAddress {
 /**
  * @brief 什么都不做
  */
+template <typename Pl>
+  requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class Nop {
  public:
   static inline constexpr std::byte COMMAND_CODE{0xE3};
 
-  void operator()(SSDUI::Context::Context<SSD1306>* ctx) const {
+  void operator()(SSDUI::Context::Context<Pl>* ctx) const {
     auto data = std::array<std::byte, 1>({COMMAND_CODE});
     ctx->renderer()->command(data);
   }
@@ -183,6 +196,8 @@ class Nop {
 /**
  * @brief 设置显示开关
  */
+template <typename Pl>
+  requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class SetDisplay {
  public:
   static inline constexpr std::byte COMMAND_DISPLAY_ON{0xAF};
@@ -194,7 +209,7 @@ class SetDisplay {
  public:
   explicit SetDisplay(bool state) : m_state(state) {}
 
-  void operator()(SSDUI::Context::Context<SSD1306>* ctx) const {
+  void operator()(SSDUI::Context::Context<Pl>* ctx) const {
     auto data = std::array<std::byte, 1>(
         {m_state ? COMMAND_DISPLAY_ON : COMMAND_DISPLAY_OFF});
     ctx->renderer()->command(data);
@@ -204,6 +219,8 @@ class SetDisplay {
 /**
  * @brief 设置对比度
  */
+template <typename Pl>
+  requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class SetContrast {
  public:
   static inline constexpr std::byte COMMAND_SET_CONTRAST{0x81};
@@ -214,7 +231,7 @@ class SetContrast {
  public:
   explicit SetContrast(uint8_t contrast) : m_contrast(contrast) {}
 
-  void operator()(SSDUI::Context::Context<SSD1306>* ctx) const {
+  void operator()(SSDUI::Context::Context<Pl>* ctx) const {
     auto data = std::array<std::byte, 2>(
         {COMMAND_SET_CONTRAST, static_cast<std::byte>(m_contrast)});
     ctx->renderer()->command(data);
@@ -224,6 +241,8 @@ class SetContrast {
 /**
  * @brief 设置显示反转
  */
+template <typename Pl>
+  requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class SetInvert {
  public:
   static inline constexpr std::byte COMMAND_INVERT_ON{0xA7};
@@ -235,7 +254,7 @@ class SetInvert {
  public:
   explicit SetInvert(bool state) : m_state(state) {}
 
-  void operator()(SSDUI::Context::Context<SSD1306>* ctx) const {
+  void operator()(SSDUI::Context::Context<Pl>* ctx) const {
     auto data = std::array<std::byte, 1>(
         {m_state ? COMMAND_INVERT_ON : COMMAND_INVERT_OFF});
     ctx->renderer()->command(data);
@@ -245,6 +264,8 @@ class SetInvert {
 /**
  * @brief 设置显示全亮
  */
+template <typename Pl>
+  requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class SetEntireDisplay {
  public:
   static inline constexpr std::byte COMMAND_ENTIRE_DISPLAY_ON{0xA5};
@@ -256,7 +277,7 @@ class SetEntireDisplay {
  public:
   explicit SetEntireDisplay(bool state) : m_state(state) {}
 
-  void operator()(SSDUI::Context::Context<SSD1306>* ctx) const {
+  void operator()(SSDUI::Context::Context<Pl>* ctx) const {
     auto data = std::array<std::byte, 1>(
         {m_state ? COMMAND_ENTIRE_DISPLAY_ON : COMMAND_ENTIRE_DISPLAY_OFF});
     ctx->renderer()->command(data);
@@ -266,6 +287,8 @@ class SetEntireDisplay {
 /**
  * @brief 设置预充电周期
  */
+template <typename Pl>
+  requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class SetPrechargePeriod {
  public:
   static inline constexpr std::byte COMMAND_SET_PRECHARGE_PERIOD{0xD9};
@@ -278,7 +301,7 @@ class SetPrechargePeriod {
   explicit SetPrechargePeriod(uint8_t period_phase1, uint8_t period_phase2)
       : m_period_phase1(period_phase1), m_period_phase2(period_phase2) {}
 
-  void operator()(SSDUI::Context::Context<SSD1306>* ctx) const {
+  void operator()(SSDUI::Context::Context<Pl>* ctx) const {
     auto data = std::array<std::byte, 2>(
         {COMMAND_SET_PRECHARGE_PERIOD,
          static_cast<std::byte>((m_period_phase2 << 4) | m_period_phase1)});
@@ -289,6 +312,8 @@ class SetPrechargePeriod {
 /**
  * @brief 设置VCOMH电压
  */
+template <typename Pl>
+  requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class SetVCOMH {
  public:
   static inline constexpr std::byte COMMAND_SET_VCOMH{0xDB};
@@ -300,7 +325,7 @@ class SetVCOMH {
   explicit SetVCOMH(uint8_t vcomh_deselect_level)
       : m_vcomh_deselect_level(vcomh_deselect_level) {}
 
-  void operator()(SSDUI::Context::Context<SSD1306>* ctx) const {
+  void operator()(SSDUI::Context::Context<Pl>* ctx) const {
     auto data = std::array<std::byte, 2>(
         {COMMAND_SET_VCOMH, static_cast<std::byte>(m_vcomh_deselect_level)});
     ctx->renderer()->command(data);
@@ -310,6 +335,8 @@ class SetVCOMH {
 /**
  * @brief 设置显示起始行
  */
+template <typename Pl>
+  requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class SetDisplayStartLine {
  public:
   static inline constexpr std::byte COMMAND_SET_DISPLAY_START_LINE{0x40};
@@ -320,7 +347,7 @@ class SetDisplayStartLine {
  public:
   explicit SetDisplayStartLine(uint8_t start_line) : m_start_line(start_line) {}
 
-  void operator()(SSDUI::Context::Context<SSD1306>* ctx) const {
+  void operator()(SSDUI::Context::Context<Pl>* ctx) const {
     auto data = std::array<std::byte, 1>(
         {COMMAND_SET_DISPLAY_START_LINE | std::byte{m_start_line}});
     ctx->renderer()->command(data);
@@ -330,6 +357,8 @@ class SetDisplayStartLine {
 /**
  * @brief 设置扫描方向
  */
+template <typename Pl>
+  requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class SetSegmentRemap {
  public:
   static inline constexpr std::byte COMMAND_SET_SEGMENT_NORMAL{0xA0};
@@ -341,7 +370,7 @@ class SetSegmentRemap {
  public:
   explicit SetSegmentRemap(bool remap) : m_remap(remap) {}
 
-  void operator()(SSDUI::Context::Context<SSD1306>* ctx) const {
+  void operator()(SSDUI::Context::Context<Pl>* ctx) const {
     auto data = std::array<std::byte, 1>(
         {m_remap ? COMMAND_SET_SEGMENT_REMAP : COMMAND_SET_SEGMENT_NORMAL});
     ctx->renderer()->command(data);
@@ -349,11 +378,15 @@ class SetSegmentRemap {
 };
 
 // alias for SetSegmentRemap
-using SetHorizontalFlip = SetSegmentRemap;
+template <typename Pl>
+  requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
+using SetHorizontalFlip = SetSegmentRemap<Pl>;
 
 /**
  * @brief 设置MUX比例
  */
+template <typename Pl>
+  requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class SetMultiplexRatio {
  public:
   static inline constexpr std::byte COMMAND_SET_MULTIPLEX_RATIO{0xA8};
@@ -364,7 +397,7 @@ class SetMultiplexRatio {
  public:
   explicit SetMultiplexRatio(uint8_t ratio) : m_ratio(ratio) {}
 
-  void operator()(SSDUI::Context::Context<SSD1306>* ctx) const {
+  void operator()(SSDUI::Context::Context<Pl>* ctx) const {
     auto data = std::array<std::byte, 2>(
         {COMMAND_SET_MULTIPLEX_RATIO, static_cast<std::byte>(m_ratio)});
     ctx->renderer()->command(data);
@@ -374,6 +407,8 @@ class SetMultiplexRatio {
 /**
  * @brief 设置COM输出扫描方向
  */
+template <typename Pl>
+  requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class SetComOutputScanDirection {
  public:
   static inline constexpr std::byte COMMAND_SET_COM_OUTPUT_SCAN_DIRECTION{0xC0};
@@ -386,7 +421,7 @@ class SetComOutputScanDirection {
  public:
   explicit SetComOutputScanDirection(bool reverse) : m_reverse(reverse) {}
 
-  void operator()(SSDUI::Context::Context<SSD1306>* ctx) const {
+  void operator()(SSDUI::Context::Context<Pl>* ctx) const {
     auto data = std::array<std::byte, 1>(
         {m_reverse ? COMMAND_SET_COM_OUTPUT_SCAN_DIRECTION_REMAP
                    : COMMAND_SET_COM_OUTPUT_SCAN_DIRECTION});
@@ -394,12 +429,16 @@ class SetComOutputScanDirection {
   }
 };
 
+template <typename Pl>
+  requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 // alias for SetComOutputScanDirection
-using SetVerticalFlip = SetComOutputScanDirection;
+using SetVerticalFlip = SetComOutputScanDirection<Pl>;
 
 /**
  * @brief 设置显示偏移
  */
+template <typename Pl>
+  requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class SetDisplayOffset {
  public:
   static inline constexpr std::byte COMMAND_SET_DISPLAY_OFFSET{0xD3};
@@ -410,7 +449,7 @@ class SetDisplayOffset {
  public:
   explicit SetDisplayOffset(uint8_t offset) : m_offset(offset) {}
 
-  void operator()(SSDUI::Context::Context<SSD1306>* ctx) const {
+  void operator()(SSDUI::Context::Context<Pl>* ctx) const {
     auto data = std::array<std::byte, 2>(
         {COMMAND_SET_DISPLAY_OFFSET, static_cast<std::byte>(m_offset)});
     ctx->renderer()->command(data);
@@ -420,6 +459,8 @@ class SetDisplayOffset {
 /**
  * @brief 设置硬件配置
  */
+template <typename Pl>
+  requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class SetComPinsHardwareConfiguration {
  public:
   static inline constexpr std::byte COMMAND_SET_COM_PINS_HARDWARE_CONFIGURATION{
@@ -432,7 +473,7 @@ class SetComPinsHardwareConfiguration {
   explicit SetComPinsHardwareConfiguration(ComPinsConfig config)
       : m_config(config) {}
 
-  void operator()(SSDUI::Context::Context<SSD1306>* ctx) const {
+  void operator()(SSDUI::Context::Context<Pl>* ctx) const {
     auto data =
         std::array<std::byte, 2>({COMMAND_SET_COM_PINS_HARDWARE_CONFIGURATION,
                                   static_cast<std::byte>(m_config)});
@@ -443,6 +484,8 @@ class SetComPinsHardwareConfiguration {
 /**
  * @brief 设置时钟分频和频率
  */
+template <typename Pl>
+  requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class SetClockRatioAndFrequency {
  public:
   static inline constexpr std::byte COMMAND_SET_CLOCK_RATIO_AND_FREQUENCY{0xD5};
@@ -455,7 +498,7 @@ class SetClockRatioAndFrequency {
   SetClockRatioAndFrequency(uint8_t ratio, uint8_t frequency)
       : m_ratio(ratio), m_frequency(frequency) {}
 
-  void operator()(SSDUI::Context::Context<SSD1306>* ctx) const {
+  void operator()(SSDUI::Context::Context<Pl>* ctx) const {
     auto data = std::array<std::byte, 2>(
         {COMMAND_SET_CLOCK_RATIO_AND_FREQUENCY,
          static_cast<std::byte>((m_frequency << 4) | m_ratio)});
@@ -466,6 +509,8 @@ class SetClockRatioAndFrequency {
 /**
  * @brief 设置充电泵
  */
+template <typename Pl>
+  requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class SetChargePump {
  public:
   static inline constexpr std::byte COMMAND_SET_CHARGE_PUMP{0x8D};
@@ -478,7 +523,7 @@ class SetChargePump {
  public:
   explicit SetChargePump(bool enable) : m_enable(enable) {}
 
-  void operator()(SSDUI::Context::Context<SSD1306>* ctx) const {
+  void operator()(SSDUI::Context::Context<Pl>* ctx) const {
     auto data = std::array<std::byte, 2>(
         {COMMAND_SET_CHARGE_PUMP, m_enable ? COMMAND_SET_CHARGE_PUMP_ENABLE
                                            : COMMAND_SET_CHARGE_PUMP_DISABLE});
@@ -489,29 +534,33 @@ class SetChargePump {
 /**
  * @brief 初始化器
  */
+template <typename Pl>
+  requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class Initializer {
  public:
   static inline constexpr uint8_t INIT_DELAY = 100;
 
-  void operator()(SSDUI::Context::Context<SSD1306>* ctx) const {
+  void operator()(SSDUI::Context::Context<Pl>* ctx) const {
     delay(INIT_DELAY);
     auto& config = ctx->config();
 
-    SetDisplay(false)(ctx);
-    SetClockRatioAndFrequency(config.clock_ratio, config.clock_frequency)(ctx);
-    SetMultiplexRatio(config.multiplex_ratio)(ctx);
-    SetDisplayOffset(config.display_offset)(ctx);
-    SetAddressingMode(config.addressing_mode)(ctx);
-    SetDisplayStartLine(config.start_line)(ctx);
-    SetSegmentRemap(config.horizontal_flip)(ctx);
-    SetComOutputScanDirection(config.vertical_flip)(ctx);
-    SetComPinsHardwareConfiguration(config.com_pins)(ctx);
-    SetPrechargePeriod(config.precharge_phase1, config.precharge_phase2)(ctx);
-    SetVCOMH(config.vcomh_level)(ctx);
-    SetEntireDisplay(config.entire_display_on)(ctx);
-    SetInvert(config.inverse_display)(ctx);
-    SetChargePump(config.charge_pump_enable)(ctx);
-    SetDisplay(config.display_on)(ctx);
+    SetDisplay<Pl>(false)(ctx);
+    SetClockRatioAndFrequency<Pl>(config.clock_ratio,
+                                  config.clock_frequency)(ctx);
+    SetMultiplexRatio<Pl>(config.multiplex_ratio)(ctx);
+    SetDisplayOffset<Pl>(config.display_offset)(ctx);
+    SetAddressingMode<Pl>(config.addressing_mode)(ctx);
+    SetDisplayStartLine<Pl>(config.start_line)(ctx);
+    SetSegmentRemap<Pl>(config.horizontal_flip)(ctx);
+    SetComOutputScanDirection<Pl>(config.vertical_flip)(ctx);
+    SetComPinsHardwareConfiguration<Pl>(config.com_pins)(ctx);
+    SetPrechargePeriod<Pl>(config.precharge_phase1,
+                           config.precharge_phase2)(ctx);
+    SetVCOMH<Pl>(config.vcomh_level)(ctx);
+    SetEntireDisplay<Pl>(config.entire_display_on)(ctx);
+    SetInvert<Pl>(config.inverse_display)(ctx);
+    SetChargePump<Pl>(config.charge_pump_enable)(ctx);
+    SetDisplay<Pl>(config.display_on)(ctx);
   }
 };
 }  // namespace SSD1306

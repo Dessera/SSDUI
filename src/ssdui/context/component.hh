@@ -35,6 +35,7 @@ class Component : public BaseComponent<Pl> {
   explicit Component(std::unique_ptr<Cm> comp) : comp_(std::move(comp)) {}
 
   void operator()(Context<Pl> *ctx) override { (*comp_)(ctx); }
+  void on_mount(Context<Pl> *ctx) override { comp_->on_mount(ctx); }
 };
 
 }  // namespace SSDUI::Context

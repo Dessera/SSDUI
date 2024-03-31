@@ -47,4 +47,19 @@ concept IsPlatform = requires {
    */
   // typename Pl::Ticker;
 };
+
+/**
+ * @brief 检查 DerivedPl 是否从 BasePl 派生
+ * TODO:
+ * 如何界定派生关系？现在我认为，只要二者的配置类型完全相同，就可以证明二者至少在代码层面可以兼容。
+ * TODO: 在渲染器接口进行大更改时，可能需要重新考虑这个问题。
+ */
+template <typename BasePl, typename DerivedPl>
+concept IsPlatformDerivedFrom = requires {
+  requires IsPlatform<BasePl>;
+  requires IsPlatform<DerivedPl>;
+  // requires std::same_as<typename BasePl::Renderer,
+  //                       typename DerivedPl::Renderer>;
+  requires std::same_as<typename BasePl::Config, typename DerivedPl::Config>;
+};
 }  // namespace SSDUI::Platform

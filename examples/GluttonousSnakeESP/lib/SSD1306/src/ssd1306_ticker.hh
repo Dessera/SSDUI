@@ -15,7 +15,7 @@
 namespace SSD1306 {
 
 template <typename Pl>
-  requires SSDUI::Platform::IsPlatform<Pl>
+  requires SSDUI::Platform::IsPlatformDerivedFrom<SSD1306, Pl>
 class Ticker {
  private:
   using SSDUIContext = SSDUI::Context::Context<Pl>;
@@ -39,9 +39,9 @@ class Ticker {
         auto sequence = context_->buffer().next().subspan(
             region.origin.x + region.origin.y * context_->buffer().width(),
             region.size.x);
-        SetColumnAddress(region.origin.x,
-                         region.origin.x + region.size.x - 1)(context_.get());
-        SetPageAddress(region.origin.y, region.origin.y)(context_.get());
+        SetColumnAddress<Pl>(region.origin.x, region.origin.x + region.size.x -
+                                                  1)(context_.get());
+        SetPageAddress<Pl>(region.origin.y, region.origin.y)(context_.get());
 
         context_->renderer()->data(sequence);
       }
