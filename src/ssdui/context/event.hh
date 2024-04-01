@@ -55,6 +55,7 @@ class EventManager {
 
       auto event = event_queue_.front();
       event_queue_.pop();
+      lock.unlock();
 
       for (const auto& listener : listeners_[event.type]) {
         listener(ctx, event.data);

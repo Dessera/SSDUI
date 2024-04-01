@@ -40,9 +40,9 @@ class GlutFood : public SSDUI::Context::BaseComponent<GlutPlatform> {
   }
 
   void operator()(SSDUI::Context::Context<GlutPlatform>* context) override {
-    // SSDUI::Components::Rectangle<GlutPlatform>{{position_, {WIDTH, WIDTH}}}(
-    //     context);
-    SSDUI::Components::Rectangle<GlutPlatform>{
-        {context->store().food, {WIDTH, WIDTH}}}(context);
+    if (context->store().state == GlutState::Running) {
+      SSDUI::Components::Rectangle<GlutPlatform>{
+          {context->store().food, {WIDTH, WIDTH}}}(context);
+    }
   }
 };

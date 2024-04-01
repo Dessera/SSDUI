@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include <Wire.h>
 
-#include <array>
 #include <glut_root.hh>
 #include <memory>
 #include <ssd1306.hh>
@@ -9,11 +8,8 @@
 #include <ssd1306_config.hh>
 #include <ssd1306_renderer.hh>
 #include <ssd1306_ticker.hh>
-#include <ssdui/context/component.hh>
-#include <ssdui/context/context.hh>
 
 #include "glut_platform.hh"
-#include "ssdui/components/geometry.hh"
 
 std::unique_ptr<SSD1306::Ticker<GlutPlatform>> ticker{nullptr};
 
@@ -23,8 +19,8 @@ void setup() {
   Serial.begin(115200);
 
   auto opt = Context::Builder<GlutPlatform>()
-                 .set_config(SSD1306::Config{.horizontal_flip = true,
-                                             .vertical_flip = true})
+                 .set_config(SSD1306::Config{
+                     .horizontal_flip = true, .vertical_flip = true, .fps = 30})
                  .set_renderer(std::make_unique<SSD1306::Renderer>(&Wire, 0x3C))
                  .set_root(std::make_unique<GlutRoot>())
                  .build();
