@@ -12,4 +12,5 @@ enum class GlutState {
 struct GlutStore {
   GlutState state{GlutState::Ready};
   SSDUI::Geometry::Point<int32_t> food{};
+  int32_t score{0};
 };

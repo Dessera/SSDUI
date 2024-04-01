@@ -32,8 +32,10 @@ class GlutFood : public SSDUI::Context::BaseComponent<GlutPlatform> {
 
   void on_mount(SSDUI::Context::Context<GlutPlatform>* context) override {
     context->event_manager().register_event(
-        GlutEvent::FoodEaten,
-        [this](auto* ctx) { ctx->store().food = _generate_position(); });
+        GlutEvent::FoodEaten, [this](auto* ctx) {
+          ctx->store().food = _generate_position();
+          ctx->store().score += 1;
+        });
     context->event_manager().register_event(
         GlutEvent::GameStart,
         [this](auto* ctx) { ctx->store().food = _generate_position(); });

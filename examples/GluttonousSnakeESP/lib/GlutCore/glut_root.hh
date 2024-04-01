@@ -34,8 +34,10 @@ class GlutRoot : public SSDUI::Context::BaseComponent<GlutPlatform> {
 
     // 触发游戏开始事件，同步全局状态
     context->event_manager().register_event(
-        GlutEvent::GameStart,
-        [this](auto* ctx) { ctx->store().state = GlutState::Running; });
+        GlutEvent::GameStart, [this](auto* ctx) {
+          ctx->store().state = GlutState::Running;
+          ctx->store().score = 0;
+        });
 
     // 在game over或预备状态下，按任意键重新开始游戏
     context->event_manager().register_event(
@@ -73,13 +75,17 @@ class GlutRoot : public SSDUI::Context::BaseComponent<GlutPlatform> {
   }
 
   void operator()(SSDUI::Context::Context<GlutPlatform>* context) override {
+    auto score = context->store().score;
+
     if (context->store().state == GlutState::Ready) {
       GlutString{"GluttonousSnake", {4, 12}}(context);
       GlutString{"Press any key", {12, 32}}(context);
     } else if (context->store().state == GlutState::Failed) {
-      GlutString{"Game Over", {16, 12}}(context);
-      GlutString{"Press any key", {12, 32}}(context);
+      GlutString{"Game Over", {28, 8}}(context);
+      GlutString{"Score: " + std::to_string(score), {30, 24}}(context);
+      GlutString{"Press any key", {12, 40}}(context);
     }
+
     snake_(context);
     food_(context);
   }
