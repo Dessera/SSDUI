@@ -1,50 +1,55 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
-#include <vector>
+#include <memory>
 
-#include "ssdui/common/geometry.hh"
+#include "HardwareSerial.h"
 #include "ssdui/common/span.hh"
+namespace SSDUI::Context {
 
-namespace ssdui::context {
-
-class CachedBuffer {
+class Buffer {
  private:
-  common::Span<uint8_t> m_current;
-  common::Span<uint8_t> m_previous;
+  std::uint8_t* prev_;
+  std::uint8_t* next_;
 
-  uint8_t m_width;
-  uint8_t m_page;
+  std::int16_t width_;
+  std::int16_t height_;
 
  public:
-  CachedBuffer(uint8_t width, uint8_t page)
-      : m_width(width),
-        m_page(page),
-        m_current(new uint8_t[width * page](), width * page),
-        m_previous(new uint8_t[width * page](), width * page) {
-    std::fill(m_current.begin(), m_current.end(), 0xFF);
-    std::fill(m_previous.begin(), m_previous.end(), 0x00);
+  Buffer(std::int16_t width, std::int16_t height);
+  ~Buffer();
+
+  Buffer(const Buffer& other);
+  Buffer& operator=(const Buffer& other);
+  Buffer(Buffer&& other) noexcept;
+  Buffer& operator=(Buffer&& other) noexcept;
+
+  [[nodiscard]] std::span<std::uint8_t> prev() const {
+    return {prev_, static_cast<std::size_t>(width_ * height_)};
+  }
+  [[nodiscard]] std::span<std::uint8_t> next() const {
+    return {next_, static_cast<std::size_t>(width_ * height_)};
   }
 
-  ~CachedBuffer() {
-    delete[] m_current.data();
-    delete[] m_previous.data();
+  [[nodiscard]] std::int16_t width() const { return width_; }
+  [[nodiscard]] std::int16_t height() const { return height_; }
+
+  void swap() noexcept {
+    std::swap(prev_, next_);
+    // auto* temp = prev_;
+    // prev_ = next_;
+    // next_ = temp;
+  }
+  void clear() noexcept { std::fill(next_, next_ + width_ * height_, 0U); }
+
+  void set(std::int16_t x, std::int16_t y, std::uint8_t value) {
+    next_[x + y * width_] = value;
   }
 
-  CachedBuffer(const CachedBuffer&) = delete;
-  CachedBuffer& operator=(const CachedBuffer&) = delete;
-  CachedBuffer(CachedBuffer&&) = delete;
-  CachedBuffer& operator=(CachedBuffer&&) = delete;
-
-  uint8_t& operator()(uint8_t x, uint8_t y) {
-    return m_current[x + y * m_width];
+  void mixin(std::int16_t x, std::int16_t y, std::uint8_t value) {
+    next_[x + y * width_] |= value;
   }
-
-  void swap() noexcept { std::swap(m_current, m_previous); }
-  void clear() { std::fill(m_current.begin(), m_current.end(), 0); }
-
-  std::vector<geometry::Rect> get_dirty_regions();
-  common::Span<uint8_t> get_area(const geometry::Rect& rect);
 };
 
-}  // namespace ssdui::context
+}  // namespace SSDUI::Context

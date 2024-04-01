@@ -1,39 +1,81 @@
 #include "ssdui/context/buffer.hh"
 
-#include <cstddef>
 #include <cstdint>
-#include <vector>
 
-#include "ssdui/common/geometry.hh"
+namespace SSDUI::Context {
 
-namespace ssdui::context {
+Buffer::Buffer(std::int16_t width, std::int16_t height)
+    : prev_(new uint8_t[width * height]),
+      next_(new uint8_t[width * height]),
+      width_(width),
+      height_(height) {
+  std::fill(prev_, prev_ + width * height, uint8_t{0});
+  std::fill(next_, next_ + width * height, uint8_t{0xFF});
+}
 
-std::vector<geometry::Rect> CachedBuffer::get_dirty_regions() {
-  // 在每个page中找到连续的dirty区域
-  std::vector<geometry::Rect> dirty_regions;
+Buffer::~Buffer() {
+  delete[] prev_;
+  delete[] next_;
+}
 
-  for (std::size_t y = 0; y < m_page; y++) {
-    std::size_t x = 0;
-    while (x < m_width) {
-      if (m_current[x + y * m_width] != m_previous[x + y * m_width]) {
-        std::size_t start = x;
-        while (x < m_width &&
-               m_current[x + y * m_width] != m_previous[x + y * m_width]) {
-          x++;
-        }
-        dirty_regions.emplace_back(geometry::Rect{{start, y}, x - start, 1});
-      } else {
-        x++;
-      }
-    }
+Buffer::Buffer(const Buffer& other)
+    : prev_(new uint8_t[other.width_ * other.height_]),
+      next_(new uint8_t[other.width_ * other.height_]),
+      width_(other.width_),
+      height_(other.height_) {
+  std::copy(other.prev_, other.prev_ + width_ * height_, prev_);
+  std::copy(other.next_, other.next_ + width_ * height_, next_);
+}
+
+Buffer::Buffer(Buffer&& other) noexcept
+    : prev_(other.prev_),
+      next_(other.next_),
+      width_(other.width_),
+      height_(other.height_) {
+  other.prev_ = nullptr;
+  other.next_ = nullptr;
+  other.width_ = 0;
+  other.height_ = 0;
+}
+
+Buffer& Buffer::operator=(const Buffer& other) {
+  if (this == &other) {
+    return *this;
   }
 
-  return dirty_regions;
+  delete[] prev_;
+  delete[] next_;
+
+  prev_ = new uint8_t[other.width_ * other.height_];
+  next_ = new uint8_t[other.width_ * other.height_];
+  width_ = other.width_;
+  height_ = other.height_;
+
+  std::copy(other.prev_, other.prev_ + width_ * height_, prev_);
+  std::copy(other.next_, other.next_ + width_ * height_, next_);
+
+  return *this;
 }
 
-common::Span<uint8_t> CachedBuffer::get_area(const geometry::Rect& rect) {
-  auto [origin, width, height] = rect;
-  return {m_current.data() + origin.x + origin.y * m_width, width * height};
+Buffer& Buffer::operator=(Buffer&& other) noexcept {
+  if (this == &other) {
+    return *this;
+  }
+
+  delete[] prev_;
+  delete[] next_;
+
+  prev_ = other.prev_;
+  next_ = other.next_;
+  width_ = other.width_;
+  height_ = other.height_;
+
+  other.prev_ = nullptr;
+  other.next_ = nullptr;
+  other.width_ = 0;
+  other.height_ = 0;
+
+  return *this;
 }
 
-}  // namespace ssdui::context
+}  // namespace SSDUI::Context

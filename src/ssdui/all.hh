@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ssdui/common.hh"
-#include "ssdui/component.hh"
+#include "ssdui/components.hh"
 #include "ssdui/context.hh"
-#include "ssdui/render.hh"
+#include "ssdui/geometry.hh"
+#include "ssdui/platform.hh"

@@ -1,61 +1,56 @@
 #pragma once
 
-#include <array>
-#include <cstddef>
-#include <initializer_list>
-#include <vector>
-namespace ssdui::common {
+// 因为当前编译环境不存在 std::span, 用该文件显式扩充 std::span 的定义
+// TODO(dessera): 后续会使用 GCC >= 12 以引入 std::span
 
-// implementation of dynamic std::span
-// environment of esp-idf does not support std::span
+#include <type_traits>
+namespace std {
 
 template <typename T>
-class Span {
- private:
-  T *m_data;
-  size_t m_size;
-
+class span {
  public:
-  Span(T *data, size_t size) : m_data(data), m_size(size) {}
+  using element_type = T;
+  using value_type = std::remove_cv_t<T>;
+  using size_type = std::size_t;
+  using difference_type = std::ptrdiff_t;
+  using pointer = T*;
+  using const_pointer = const T*;
+  using reference = T&;
+  using const_reference = const T&;
+  using iterator = T*;
+  using const_iterator = const T*;
 
-  // enable more constructors
+  constexpr span() noexcept : data_(nullptr), size_(0) {}
+  constexpr span(std::nullptr_t) noexcept : span() {}
+  constexpr span(T* data, size_type size) noexcept : data_(data), size_(size) {}
+  template <size_type N>
+  constexpr span(T (&data)[N]) noexcept : data_(data), size_(N) {}
+  template <typename Container>
+  constexpr span(Container& container) noexcept
+      : data_(container.data()), size_(container.size()) {}
 
-  // initializer list
-  Span(std::initializer_list<T> list)
-      : m_data(const_cast<T *>(list.begin())), m_size(list.size()) {}
+  constexpr T* data() const noexcept { return data_; }
+  [[nodiscard]] constexpr size_type size() const noexcept { return size_; }
+  [[nodiscard]] constexpr bool empty() const noexcept { return size_ == 0; }
 
-  ~Span() = default;
-
-  // array
-  template <std::size_t N>
-  explicit Span(const std::array<T, N> &array)
-      : m_data(array.data()), m_size(N) {}
-
-  explicit Span(const std::vector<T> &vector)
-      : m_data(vector.data()), m_size(vector.size()) {}
-
-  Span(const Span<T> &other) = default;
-  Span(Span<T> &&other) = default;
-  Span<T> &operator=(const Span<T> &other) = default;
-  Span<T> &operator=(Span<T> &&other) = default;
-
-  T *data() { return m_data; }
-  const T *data() const { return m_data; }
-
-  std::size_t size() const { return m_size; }
-
-  T &operator[](std::size_t index) { return m_data[index]; }
-  const T &operator[](std::size_t index) const { return m_data[index]; }
-
-  T *begin() { return m_data; }
-  const T *begin() const { return m_data; }
-
-  T *end() { return m_data + m_size; }
-  const T *end() const { return m_data + m_size; }
-
-  Span<T> subspan(std::size_t offset, std::size_t count) {
-    return Span<T>(m_data + offset, count);
+  constexpr T& operator[](size_type index) const noexcept {
+    return data_[index];
   }
+  constexpr T& front() const noexcept { return data_[0]; }
+  constexpr T& back() const noexcept { return data_[size_ - 1]; }
+
+  constexpr T* begin() const noexcept { return data_; }
+  constexpr T* end() const noexcept { return data_ + size_; }
+  constexpr T* cbegin() const noexcept { return data_; }
+  constexpr T* cend() const noexcept { return data_ + size_; }
+
+  constexpr span<T> subspan(size_type offset, size_type count) const noexcept {
+    return {data_ + offset, count};
+  }
+
+ private:
+  T* data_;
+  size_type size_;
 };
 
-}  // namespace ssdui::common
+}  // namespace std
